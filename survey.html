@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback — Learnihub</title>
+    <title>Submit Survey — Learnihub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Sessiya yoxlanışı
@@ -25,7 +25,7 @@
                         <span class="mx-4 font-medium">My Courses</span>
                     </a>
                     <a class="flex items-center px-4 py-2 mt-5 text-gray-700 bg-gray-100 rounded-lg" href="survey.html">
-                        <span class="mx-4 font-medium">Add Feedback</span>
+                        <span class="mx-4 font-medium">Submit Course</span>
                     </a>
                     <a class="flex items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-100 rounded-lg" href="admin.html">
                         <span class="mx-4 font-medium">Admin</span>
@@ -45,17 +45,17 @@
 
         <main class="flex-1 h-screen overflow-y-auto bg-gray-50 p-6 lg:p-10">
             <div class="max-w-2xl mx-auto">
-                <h1 class="text-2xl font-bold text-gray-800 mb-8">Course <span class="text-indigo-600">Feedback</span></h1>
+                <h1 class="text-2xl font-bold text-gray-800 mb-8">Course <span class="text-indigo-600">Submission</span></h1>
                 
                 <div class="bg-white rounded-2xl shadow-sm border p-8">
                     <form id="surveyForm" class="space-y-5">
                         <div>
-                            <label class="text-sm font-bold text-gray-700 mb-2 block">FULL NAME</label>
-                            <input type="text" id="full_name" placeholder="Fatima Asadova" class="block w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                            <label class="text-sm font-bold text-gray-700 mb-2 block">USERNAME </label>
+                            <input type="text" id="full_name" placeholder="Username" class="block w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
                         </div>
                         <div>
                             <label class="text-sm font-bold text-gray-700 mb-2 block">COURSE NAME *</label>
-                            <input type="text" id="course_name" required placeholder="e.g. AP Calculus" class="block w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                            <input type="text" id="course_name" required placeholder="e.g. maths" class="block w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
                         </div>
                         <div>
                             <label class="text-sm font-bold text-gray-700 mb-2 block">COURSE LINK *</label>
@@ -64,10 +64,12 @@
                         <div>
                             <label class="text-sm font-bold text-gray-700 mb-2 block">CATEGORY</label>
                             <select id="category" class="block w-full px-4 py-3 border border-gray-200 rounded-xl outline-none cursor-pointer focus:border-indigo-500">
-                                <option value="math">Math</option>
-                                <option value="development">Development</option>
-                                <option value="design">Design</option>
-                                <option value="language">Language</option>
+                                <option value="math">Mathematics</option>
+                                <option value="development">Language</option>
+                                <option value="design">Internship</option>
+                                <option value="language">STEM</option>
+                                <option value="language">Summer School</option>
+                                <option value="language">Other</option>
                             </select>
                         </div>
                         <div>
@@ -78,7 +80,7 @@
                         <div id="message" class="hidden p-4 rounded-xl text-sm font-medium"></div>
 
                         <button type="submit" id="surveySubmitBtn" class="w-full px-6 py-4 text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 font-bold shadow-lg transition disabled:opacity-50">
-                            Submit Feedback
+                            Submit
                         </button>
                     </form>
                 </div>
@@ -111,16 +113,16 @@
             surveyForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                // ELEMENTLƏRİN MÖVCUDLUĞUNU YOXLA (Xətanın qarşısını almaq üçün)
+                // ID-lərin uyğunluğu: full_name, course_name, course_link, category, description
                 const nameField = document.getElementById('full_name');
                 const courseField = document.getElementById('course_name');
                 const linkField = document.getElementById('course_link');
                 const categoryField = document.getElementById('category');
                 const descField = document.getElementById('description');
     
-                // Əgər elementlərdən biri belə tapılmasa, konsolda bizə xəbər verəcək
-                if (!courseField || !linkField) {
-                    console.error("KRİTİK XƏTA: HTML-də ID-lər tapılmadı! 'course_name' və 'course_link' ID-lərini yoxla.");
+                // Əgər elementlərdən biri tapılmasa, script davam etməsin
+                if (!nameField || !courseField || !linkField || !categoryField || !descField) {
+                    console.error("KRİTİK XƏTA: Form ID-ləri tapılmadı. 'course_name' və 'course_link' daxil olmaqla bütün ID-ləri yoxlayın.");
                     return;
                 }
     
@@ -181,7 +183,7 @@
                     messageDiv.classList.remove('hidden');
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.innerText = "Submit Feedback";
+                    submitBtn.innerText = "Submit";
                 }
             });
         }

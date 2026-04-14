@@ -18,7 +18,7 @@
             <span class="mx-4 font-medium">My Courses</span>
           </a>
           <a class="flex items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-100 rounded-lg" href="survey.html">
-            <span class="mx-4 font-medium">Add Feedback</span>
+            <span class="mx-4 font-medium">Submit Course</span>
           </a>
           <a class="flex items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-100 rounded-lg" href="admin.html">
             <span class="mx-4 font-medium">Admin</span>
@@ -39,15 +39,21 @@
 
     <main class="flex-1 h-screen overflow-y-auto bg-gray-50 p-6 lg:p-10">
       <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Professional Course Catalog</h1>
-      <p class="mt-2 text-gray-600">Live data from backend with resilient fallback and fast filtering.</p>
-      </section>
+      <h1 class="text-3xl font-bold text-gray-900">Course Catalog</h1>
+     <p class="mt-2 text-gray-600">Explore active courses</p>
+     </section>
 
       <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <input id="searchInput" type="text" placeholder="Search courses..." class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
         <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
           <option value="">All Categories</option>
+          <option value="math">Mathematics</option>
+          <option value="development">Language</option>
+          <option value="design">Internship</option>
+          <option value="language">STEM</option>
+          <option value="language">Summer School</option>
+          <option value="language">Other</option>
         </select>
         <button id="clearBtn" class="px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700">Clear Filters</button>
       </div>
@@ -169,11 +175,8 @@
         console.error('Course fetch error:', error);
         populateCategories(fallbackCourses);
         renderCourses(fallbackCourses);
-        // Keep UX consistent: fallback results should still respect current filters.
+        // Keep filters applied without showing backend fallback notices in UI.
         runFilters();
-        if (!searchInput.value.trim() && !categoryFilter.value) {
-          searchResults.textContent = 'Showing fallback courses (backend temporarily unavailable)';
-        }
       }
     }
 
