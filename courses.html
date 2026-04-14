@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses — Learnihub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Giriş yoxlanışı
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body class="bg-white">
+    <div class="flex flex-col h-screen md:flex-row">
+        
+        <aside class="flex flex-col w-64 h-screen px-4 py-8 overflow-y-auto bg-white border-r">
+            <h2 class="text-3xl font-black text-indigo-600 px-5 tracking-tighter">
+                <a href="index.html">Learnihub</a>
+            </h2>
+
+            <div class="flex flex-col justify-between flex-1 mt-6">
+                <nav class="space-y-4">
+                    <a class="flex items-center px-4 py-2 text-indigo-700 bg-indigo-50 rounded-xl font-bold transition-all" href="courses.html">
+                        <span class="mx-4">My Courses</span>
+                    </a>
+
+                    <a class="flex items-center px-4 py-2 text-gray-600 transition-all duration-300 rounded-xl hover:bg-gray-100" href="survey.html">
+                        <span class="mx-4 font-medium">Add Feedback</span>
+                    </a>
+
+                    <a class="flex items-center px-4 py-2 text-gray-600 transition-all duration-300 rounded-xl hover:bg-gray-100" href="index.html">
+                        <span class="mx-4 font-medium">Home Page</span>
+                    </a>
+
+                    <div class="mt-10 px-5 py-5 bg-gradient-to-br from-indigo-50 to-white rounded-2xl border border-indigo-100 shadow-sm">
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Support</h3>
+                        <p class="text-[11px] text-gray-500 mt-1 leading-relaxed">Need help?</p>
+                        <div class="mt-4 space-y-2">
+                            <a href="mailto:info@learnihub.az" class="text-[11px] font-bold text-gray-700 hover:text-indigo-600 flex items-center gap-2">
+                                <span>✉️</span> info@learnihub.az
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="mt-6 border-t pt-6 px-4">
+                    <div class="flex items-center gap-3">
+                        <div class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold uppercase">
+                            FA
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p id="userEmailDisplay" class="text-xs font-bold text-gray-900 truncate italic"></p>
+                            <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Premium Learner</p>
+                        </div>
+                    </div>
+                    <button id="logoutBtn" class="w-full mt-4 px-4 py-2 text-xs font-bold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 h-screen overflow-y-auto bg-gray-50/50 p-6 lg:p-12">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                <div>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Your <span class="text-indigo-600">Dashboard</span></h1>
+                    <p class="mt-2 text-gray-500 font-medium italic">Explore and manage your active courses.</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input type="text" id="searchInput" placeholder="Search..." class="px-5 py-3 bg-white border border-gray-100 rounded-2xl focus:ring-4 focus:ring-indigo-50 outline-none transition-all w-64 shadow-sm text-sm">
+                    <select id="categoryFilter" class="px-5 py-3 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm text-sm font-bold text-gray-600">
+                        <option value="">All Categories</option>
+                        <option value="development">Development</option>
+                        <option value="design">Design</option>
+                        <option value="math">Math</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="coursesContainer" class="grid grid-cols-1 gap-8 mt-12 md:grid-cols-2 lg:grid-cols-3">
+                <p class="text-gray-400 font-bold col-span-full text-center py-20 italic">Connecting to database...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 1. İSTİFADƏÇİ MƏLUMATI
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (userData) {
+            document.getElementById('userEmailDisplay').textContent = userData.email;
+        }
+
+        // 2. LOGOUT
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        });
+
+        // 3. DINAMIK KURSLARI ÇƏKMƏK
+        async function loadCourses() {
+            const container = document.getElementById('coursesContainer');
+            
+            try {
+                // Render Backend URL
+                const response = await fetch('https://learnihub-backend.onrender.com/api/courses');
+                
+                if (!response.ok) {
+                    throw new Error('Server cavab vermir');
+                }
+
+                const courses = await response.json();
+                console.log("Kurslar yükləndi:", courses);
+
+                container.innerHTML = ''; 
+
+                if (courses.length === 0) {
+                    container.innerHTML = '<p class="col-span-full text-gray-400 text-center py-20">No courses found in database.</p>';
+                    return;
+                }
+
+                courses.forEach(course => {
+                    const card = document.createElement('div');
+                    card.className = "course-card group bg-white p-2 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300";
+                    card.setAttribute('data-category', course.category.toLowerCase());
+
+                    // Kateqoriyaya görə ikon seçimi
+                    let icon = '💻';
+                    if (course.category.toLowerCase() === 'math') icon = '🧮';
+                    if (course.category.toLowerCase() === 'design') icon = '🎨';
+
+                    card.innerHTML = `
+                        <div class="bg-indigo-600 h-44 rounded-[2.2rem] mb-6 flex items-center justify-center text-5xl group-hover:scale-95 transition-transform duration-500">
+                            ${icon}
+                        </div>
+                        <div class="px-5 pb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full">${course.category}</span>
+                                <span class="text-xs font-bold text-gray-400 italic">${course.duration || 'Flexible'}</span>
+                            </div>
+                            <h2 class="text-xl font-black text-gray-800 leading-tight">${course.title}</h2>
+                            <p class="mt-3 text-sm text-gray-500 leading-relaxed line-clamp-2">${course.description}</p>
+                            <div class="mt-8 flex items-center justify-between">
+                                <a href="${course.link || '#'}" class="px-6 py-3.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-indigo-600 transition-colors shadow-lg shadow-gray-200">Start Learning</a>
+                                <span class="text-sm font-black text-indigo-600">${course.progress || '0%'}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("Kurslar yüklənmədi:", error);
+                container.innerHTML = '<p class="col-span-full text-red-400 font-bold italic text-center py-20">Could not load courses. Check backend connection.</p>';
+            }
+        }
+
+        // 4. AXTARIŞ VƏ FİLTER LOGİKASI
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCat = document.getElementById('categoryFilter').value.toLowerCase();
+            const cards = document.querySelectorAll('.course-card');
+
+            cards.forEach(card => {
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                const category = card.getAttribute('data-category');
+                
+                const matchesSearch = title.includes(searchTerm);
+                const matchesCat = !selectedCat || category === selectedCat;
+
+                card.style.display = (matchesSearch && matchesCat) ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterContent);
+        document.getElementById('categoryFilter').addEventListener('change', filterContent);
+
+        // Səhifə açılanda kursları yüklə
+        loadCourses();
+    </script>
+</body>
+</html>
