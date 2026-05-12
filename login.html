@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Learnihub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background-color: #fcfaf2; 
+    }
+
+    .auth-card {
+      background-color: #f2ead3; 
+      border-radius: 40px;
+      border: 1px solid #e5dec5;
+    }
+
+    .input-style { 
+      background-color: #ebe4cf; 
+      border: 1px solid #b5af9a; 
+      transition: all 0.3s ease; 
+      color: #4a4a4a;
+    }
+
+    .input-style:focus { 
+      outline: none; 
+      border-color: #5e4d74;
+      background-color: #fff;
+    }
+
+    .btn-panel {
+      background-color: #5e4d74;
+      color: white;
+      border-radius: 24px;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-panel:hover {
+      background-color: #4d3f5f;
+      transform: translateY(-1px);
+    }
+    
+    #forgotModal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    #forgotModal.hidden { opacity: 0; visibility: hidden; display: none; }
+    #forgotModal.active { opacity: 1; visibility: visible; display: flex; }
+
+    @media (max-width: 640px) {
+      .auth-card { border-radius: 30px; padding: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-900">
+  
+  <header class="max-w-7xl mx-auto w-full px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="group flex items-center text-gray-600 hover:text-[#5e4d74] transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span class="text-sm font-bold uppercase tracking-wider" data-key="navBack">Geri</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-2 bg-[#ebe4cf] p-1 rounded-xl border border-[#d8d0b8]">
+      <button onclick="toggleLanguage('az')" id="btnAz" class="px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest">AZ</button>
+      <button onclick="toggleLanguage('en')" id="btnEn" class="px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest">EN</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-4">
+    <div class="auth-card w-full max-w-md p-8 md:p-10 shadow-sm">
+      <div class="mb-8 text-left">
+        <h1 class="text-2xl font-bold text-gray-900" data-key="loginTitle">Daxil olun</h1>
+        <p class="text-gray-600 mt-2 text-sm font-medium" data-key="loginSub">Giriş etmək üçün məlumatlarınızı daxil edin.</p>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelEmail">E-POÇT ÜNVANI</label>
+          <input type="email" id="email" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div class="relative">
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest" data-key="labelPass">ŞİFRƏ</label>
+            <button type="button" onclick="openModal()" class="text-[10px] font-bold text-[#5e4d74] hover:underline uppercase tracking-widest" data-key="forgotBtn">Şifrəni unutmusunuz?</button>
+          </div>
+          <input type="password" id="password" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div id="loginMessage" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+        <button type="submit" id="loginBtn" class="btn-panel w-full font-bold py-4 transition-all text-sm uppercase tracking-[2px]" data-key="loginBtn">Daxil ol</button>
+      </form>
+      <p class="text-center text-gray-500 mt-8 text-xs font-semibold">
+        <span data-key="noAcc">Hesabınız yoxdur?</span> <a href="register.html" class="text-[#5e4d74] font-extrabold hover:underline" data-key="goReg">Hesab yaradın</a>
+      </p>
+    </div>
+  </main>
+
+  <div id="forgotModal" class="hidden fixed inset-0 z-[100] bg-gray-900/40 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-[#fcfaf2] w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-[#e5dec5]">
+      <h2 class="text-xl font-bold text-gray-900 mb-2" data-key="modalTitle">Şifrəni bərpa et</h2>
+      <p class="text-gray-500 text-xs mb-6 font-medium" data-key="modalSub">E-poçt ünvanınızı yazın, bərpa linkini göndərək.</p>
+      
+      <form id="forgotForm" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelEmail">E-POÇT ÜNVANI</label>
+          <input type="email" id="resetEmail" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div id="modalMessage" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal()" class="flex-1 px-4 py-3 border border-[#b5af9a] text-gray-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-[#ebe4cf] transition-all" data-key="btnCancel">Ləğv et</button>
+          <button type="submit" id="resetBtn" class="flex-1 px-4 py-3 btn-panel text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all" data-key="btnSend">Göndər</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      az: {
+        navBack: "Geri qayıt", headerRegBtn: "Qeydiyyat", loginTitle: "Daxil olun", loginSub: "Giriş etmək üçün məlumatlarınızı daxil edin.",
+        labelEmail: "E-POÇT ÜNVANI", labelPass: "ŞİFRƏ", forgotBtn: "Şifrəni unutmusunuz?", loginBtn: "Daxil ol",
+        noAcc: "Hesabınız yoxdur?", goReg: "Hesab yaradın", verifying: "Yoxlanılır...", success: "Uğurlu! Yönləndirilir...",
+        modalTitle: "Şifrəni bərpa et", modalSub: "E-poçt ünvanınızı yazın, bərpa linkini göndərək.", btnCancel: "Ləğv et", btnSend: "Göndər",
+        sentSuccess: "Bərpa linki göndərildi!", error: "Xəta baş verdi.",
+        phEmail: "nümunə@mail.com", phPass: "••••••••"
+      },
+      en: {
+        navBack: "Go Back", headerRegBtn: "Sign Up", loginTitle: "Sign In", loginSub: "Enter your details to sign in.",
+        labelEmail: "EMAIL ADDRESS", labelPass: "PASSWORD", forgotBtn: "Forgot password?", loginBtn: "Sign In",
+        noAcc: "Don't have an account?", goReg: "Create account", verifying: "Verifying...", success: "Success! Redirecting...",
+        modalTitle: "Reset Password", modalSub: "Enter your email to receive a reset link.", btnCancel: "Cancel", btnSend: "Send",
+        sentSuccess: "Reset link sent!", error: "An error occurred.",
+        phEmail: "example@mail.com", phPass: "••••••••"
+      }
+    };
+
+    let currentLang = localStorage.getItem('preferredLang') || 'az';
+
+    function updateLanguageUI() {
+      const btnAz = document.getElementById('btnAz');
+      const btnEn = document.getElementById('btnEn');
+      
+      if (currentLang === 'az') {
+        btnAz.className = "px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest bg-white text-[#5e4d74] shadow-sm";
+        btnEn.className = "px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest text-gray-500 hover:text-black";
+      } else {
+        btnEn.className = "px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest bg-white text-[#5e4d74] shadow-sm";
+        btnAz.className = "px-3 py-1.5 text-xs font-bold transition-all rounded-lg uppercase tracking-widest text-gray-400 hover:text-black";
+      }
+
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+      });
+
+      document.getElementById('email').placeholder = translations[currentLang].phEmail;
+      document.getElementById('resetEmail').placeholder = translations[currentLang].phEmail;
+      document.getElementById('password').placeholder = translations[currentLang].phPass;
+    }
+
+    function toggleLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('preferredLang', currentLang);
+      updateLanguageUI();
+    }
+
+    function openModal() { 
+      document.getElementById('forgotModal').classList.add('active'); 
+      document.getElementById('forgotModal').classList.remove('hidden'); 
+      document.getElementById('modalMessage').classList.add('hidden');
+    }
+    
+    function closeModal() { 
+      document.getElementById('forgotModal').classList.remove('active'); 
+      document.getElementById('forgotModal').classList.add('hidden'); 
+    }
+
+    window.addEventListener('DOMContentLoaded', updateLanguageUI);
+
+    const _supabaseUrl = "https://sqgphrdkthiixeikialy.supabase.co"; 
+    const _supabaseKey = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const msg = document.getElementById('loginMessage');
+      btn.disabled = true;
+      btn.innerText = translations[currentLang].verifying;
+      
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      });
+
+      if (error) {
+        msg.innerText = error.message;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
+        msg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerText = translations[currentLang].loginBtn;
+      } else {
+        localStorage.setItem('loggedInUser', JSON.stringify(data.user));
+        btn.innerText = translations[currentLang].success;
+        msg.innerText = translations[currentLang].success;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-green-100 text-green-700 block mb-4";
+        msg.classList.remove('hidden');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+      }
+    });
+
+    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const resetEmail = document.getElementById('resetEmail').value.trim();
+      const btn = document.getElementById('resetBtn');
+      const msg = document.getElementById('modalMessage');
+      
+      btn.disabled = true;
+      btn.innerText = "...";
+
+      const redirectUrl = window.location.origin + '/reset-password.html';
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        msg.innerText = error.message;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
+        msg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerText = translations[currentLang].btnSend;
+      } else {
+        msg.innerText = translations[currentLang].sentSuccess;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-green-100 text-green-700 block mb-4";
+        msg.classList.remove('hidden');
+        btn.innerText = "✓";
+        setTimeout(() => { 
+          closeModal(); 
+          btn.disabled = false; 
+          btn.innerText = translations[currentLang].btnSend;
+          msg.classList.add('hidden'); 
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>

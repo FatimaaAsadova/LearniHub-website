@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — Learnihub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background-color: #fcfaf2; 
+    }
+
+    .auth-card {
+      background-color: #f2ead3; 
+      border-radius: 40px;
+    }
+
+    .input-style { 
+      background-color: #ebe4cf; 
+      border: 1px solid #b5af9a; 
+      transition: all 0.3s ease; 
+      color: #4a4a4a;
+    }
+
+    .input-style:focus { 
+      outline: none; 
+      border-color: #5e4d74;
+      background-color: #fff;
+    }
+
+    .btn-panel {
+      background-color: #5e4d74;
+      color: white;
+      border-radius: 24px; 
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-panel:hover {
+      background-color: #4d3f5f;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) { 
+      .auth-card { border-radius: 30px; padding: 1.5rem !important; } 
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  
+  <header class="max-w-7xl mx-auto w-full px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="group flex items-center text-gray-600 hover:text-[#5e4d74] transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span class="text-sm font-bold uppercase tracking-wider" data-key="navBack">Geri</span>
+      </a>
+    </div>
+
+    <div class="flex items-center gap-2 bg-[#ebe4cf] p-1 rounded-xl">
+      <button onclick="setLanguage('az')" id="btnAz" class="px-3 py-1.5 text-xs font-bold rounded-lg uppercase transition-all">AZ</button>
+      <button onclick="setLanguage('en')" id="btnEn" class="px-3 py-1.5 text-xs font-bold rounded-lg uppercase transition-all">EN</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-4 pb-12">
+    <div class="auth-card w-full max-w-md p-10 shadow-sm border border-[#e5dec5]">
+      <div class="mb-8 text-left">
+        <h1 class="text-2xl font-bold text-gray-900" data-key="regTitle">Daxil ol / Qeydiyyat</h1>
+        <p class="text-gray-600 mt-2 text-sm font-medium" data-key="regSub">Öyrənmə yoluna bu gün başlayın.</p>
+      </div>
+
+      <button id="googleBtn" class="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all mb-6">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+        <span data-key="btnGoogle">GOOGLE İLƏ DAVAM ET</span>
+      </button>
+
+      <div class="flex items-center gap-4 mb-6">
+        <div class="h-px bg-[#e5dec5] flex-1"></div>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" data-key="dividerOr">VƏ YA</span>
+        <div class="h-px bg-[#e5dec5] flex-1"></div>
+      </div>
+
+      <form id="registerForm" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelFullname">TAM ADINIZ</label>
+          <input type="text" id="fullname" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelEmail">E-POÇT ÜNVANI</label>
+          <input type="email" id="email" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelPass">ŞİFRƏ</label>
+          <input type="password" id="password" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelConfirm">ŞİFRƏNİ TƏSDİQLƏYİN</label>
+          <input type="password" id="confirmPassword" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+        </div>
+        
+        <div id="message" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+        
+        <button type="submit" id="regBtn" class="btn-panel w-full font-bold py-4 transition-all text-sm uppercase tracking-[2px] mt-4" data-key="btnRegister">Panelə keç</button>
+      </form>
+
+      <p class="text-center text-gray-500 mt-8 text-xs font-semibold">
+        <span data-key="hasAcc">Artıq hesabınız var?</span> <a href="login.html" class="text-[#5e4d74] font-extrabold hover:underline" data-key="goLogin">Daxil olun</a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const translations = {
+      az: {
+        navBack: "Geri qayıt", regTitle: "Daxil ol / Qeydiyyat", regSub: "Öyrənmə yoluna bu gün başlayın.",
+        labelFullname: "TAM ADINIZ", labelEmail: "E-POÇT ÜNVANI", labelPass: "ŞİFRƏ", labelConfirm: "ŞİFRƏNİ TƏSDİQLƏYİN",
+        btnRegister: "PANELƏ KEÇ", hasAcc: "Artıq hesabınız var?", goLogin: "Daxil olun",
+        creating: "Yaradılır...", success: "Uğurlu! Yönləndirilir...", 
+        matchErr: "Şifrilər uyğun gəlmir!", phName: "Ad Soyad", phEmail: "nümunə@mail.com", phPass: "••••••••",
+        btnGoogle: "GOOGLE İLƏ DAVAM ET", dividerOr: "VƏ YA"
+      },
+      en: {
+        navBack: "Go Back", regTitle: "Sign In / Register", regSub: "Start your learning journey today.",
+        labelFullname: "FULL NAME", labelEmail: "EMAIL ADDRESS", labelPass: "PASSWORD", labelConfirm: "CONFIRM PASSWORD",
+        btnRegister: "GO TO PANEL", hasAcc: "Already have an account?", goLogin: "Sign In",
+        creating: "Creating...", success: "Success! Redirecting...",
+        matchErr: "Passwords do not match!", phName: "Full Name", phEmail: "example@mail.com", phPass: "••••••••",
+        btnGoogle: "CONTINUE WITH GOOGLE", dividerOr: "OR"
+      }
+    };
+
+    let currentLang = localStorage.getItem('preferredLang') || 'az';
+
+    function updateUI() {
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+      });
+
+      document.getElementById('fullname').placeholder = translations[currentLang].phName;
+      document.getElementById('email').placeholder = translations[currentLang].phEmail;
+      document.getElementById('password').placeholder = translations[currentLang].phPass;
+      document.getElementById('confirmPassword').placeholder = translations[currentLang].phPass;
+
+      const btnAz = document.getElementById('btnAz');
+      const btnEn = document.getElementById('btnEn');
+      
+      if (currentLang === 'az') {
+        btnAz.className = "px-3 py-1.5 text-xs font-bold rounded-lg uppercase bg-white text-[#5e4d74] shadow-sm";
+        btnEn.className = "px-3 py-1.5 text-xs font-bold rounded-lg uppercase text-gray-500 hover:text-black";
+      } else {
+        btnEn.className = "px-3 py-1.5 text-xs font-bold rounded-lg uppercase bg-white text-[#5e4d74] shadow-sm";
+        btnAz.className = "px-3 py-1.5 text-xs font-bold rounded-lg uppercase text-gray-500 hover:text-black";
+      }
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('preferredLang', lang);
+      updateUI();
+    }
+
+    window.addEventListener('DOMContentLoaded', updateUI);
+
+    const _supabaseUrl = "https://sqgphrdkthiixeikialy.supabase.co"; 
+    const _supabaseKey = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+    // GOOGLE LOGIN DÜZƏLİŞİ
+    document.getElementById('googleBtn').addEventListener('click', async () => {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { 
+          // redirectTo mütləq Supabase Dashboard-da Site URL olaraq təyin edilən link olmalıdır
+          redirectTo: window.location.origin + '/index.html',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account' // Bu sətr hesab seçmə pəncərəsinin mütləq açılmasını təmin edir
+          }
+        }
+      });
+      
+      if (error) {
+        const msg = document.getElementById('message');
+        msg.innerText = error.message;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
+        msg.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('regBtn');
+      const msg = document.getElementById('message');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const fullname = document.getElementById('fullname').value.trim();
+
+      if (password !== confirmPassword) {
+        msg.innerText = translations[currentLang].matchErr;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
+        msg.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = translations[currentLang].creating;
+      msg.classList.add('hidden');
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: { data: { full_name: fullname } }
+      });
+
+      if (error) {
+        msg.innerText = error.message;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
+        msg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerText = translations[currentLang].btnRegister;
+      } else {
+        btn.innerText = translations[currentLang].success;
+        msg.innerText = translations[currentLang].success;
+        msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-green-100 text-green-700 block mb-4";
+        msg.classList.remove('hidden');
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+      }
+    });
+  </script>
+</body>
+</html>

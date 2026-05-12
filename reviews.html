@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details — Learnihub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F7F3E9;
+            color: #1E1B2E;
+            margin: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; 
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 20px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #5D4E6D;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            transition: 0.2s;
+            border-radius: 15px;
+        }
+
+        .nav-active {
+            background: #D1C4D9;
+            border: 2px solid #1E1B2E;
+            box-shadow: 4px 4px 0px #1E1B2E;
+            color: #1E1B2E;
+        }
+
+        .lang-switch {
+            display: flex;
+            background: white;
+            border: 2px solid #1E1B2E;
+            border-radius: 15px;
+            padding: 4px;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0px #1E1B2E;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .lang-active {
+            background: #1E1B2E;
+            color: white;
+        }
+
+        .user-section {
+            background: #1E1B2E;
+            border-radius: 15px;
+            padding: 12px;
+            box-shadow: 4px 4px 0px #6366F1;
+        }
+
+        .user-profile-btn {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        /* Main Design */
+        .main-container {
+            background: #EBE6D9;
+            border: 2px solid #1E1B2E;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 4px 4px 0px #D1C4D9;
+        }
+
+        .left-panel { flex: 1.5; }
+        .right-panel { flex: 1; }
+
+        /* Kurs Məlumat Kartı */
+        .info-box {
+            background: white;
+            border: 2px solid #1E1B2E;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 15px;
+            box-shadow: 4px 4px 0px #1E1B2E;
+        }
+
+        .info-tag {
+            display: inline-block;
+            background: #C8BFE7;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid #1E1B2E;
+            margin-bottom: 10px;
+        }
+
+        .section-header {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .review-card {
+            background: #DED9CD;
+            border: 1px solid #1E1B2E;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .mini-input-box {
+            background: #DED9CD;
+            border: 1px solid #1E1B2E;
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mini-input-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 11px;
+        }
+
+        .btn-mini-share {
+            background: #C8BFE7;
+            color: #1E1B2E;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid #1E1B2E;
+            cursor: pointer;
+        }
+
+        .badge-top {
+            background: #C8BFE7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid #1E1B2E;
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <aside class="sidebar">
+        <h2 class="text-2xl font-black mb-10">LEARNI<span class="text-indigo-600">HUB</span></h2>
+        <nav class="flex-1">
+            <a href="index.html" class="nav-link">Home Page</a>
+            <a href="courses.html" class="nav-link nav-active">My Courses</a>
+            <a href="survey.html" class="nav-link">Submit Course</a>
+        </nav>
+        <div class="lang-switch">
+            <div class="lang-btn lang-active" id="btn-az">AZ</div>
+            <div class="lang-btn" id="btn-en">EN</div>
+        </div>
+        <div class="user-section">
+            <div class="user-profile-btn">
+                <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-bold text-white text-xs" id="uInit">U</div>
+                <span id="uEmail" class="text-[11px] font-bold truncate">Yüklənir...</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-12">
+        <div class="mb-6">
+            <span class="badge-top">KURS MƏLUMATLARI VƏ RƏYLƏR</span>
+            <h1 id="mainTitle" class="text-3xl font-black mt-3">Course - Details</h1>
+        </div>
+
+        <div class="main-container">
+            <section class="left-panel">
+                <h3 class="section-header">Kurs Haqqında</h3>
+                <div class="info-box">
+                    <span class="info-tag">FULL-STACK WEB DEVELOPMENT</span>
+                    <h2 id="courseInfoTitle" class="text-xl font-black mb-3">Kursun Adı</h2>
+                    <p class="text-xs leading-relaxed opacity-80 mb-4">
+                        Bu kurs müasir veb texnologiyalarını (HTML, CSS, JavaScript) və backend sistemlərini sıfırdan öyrətmək üçün nəzərdə tutulub. Layihə əsaslı öyrənmə ilə real veb tətbiqlər quracaqsınız.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-[#F7F3E9] p-3 rounded-xl border border-[#1E1B2E]">
+                            <p class="text-[10px] font-bold opacity-50">MÜDDƏT</p>
+                            <p class="text-xs font-black">6 Ay / 24 Həftə</p>
+                        </div>
+                        <div class="bg-[#F7F3E9] p-3 rounded-xl border border-[#1E1B2E]">
+                            <p class="text-[10px] font-bold opacity-50">SƏVİYYƏ</p>
+                            <p class="text-xs font-black">Başlanğıc - Orta</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="right-panel">
+                <h3 class="section-header">İstifadəçi Rəyləri</h3>
+                
+                <div id="reviewsContainer" class="max-h-[350px] overflow-y-auto mb-6 pr-2">
+                    </div>
+
+                <h3 class="section-header">YENİ RƏY YAZIN</h3>
+                <div class="flex items-center gap-2 mb-2 mt-2">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs" id="uInitSmall">U</div>
+                    <span class="text-[11px] font-bold" id="uEmailSmall">User</span>
+                </div>
+                <div class="mini-input-box">
+                    <input type="text" id="miniReviewText" placeholder="Burada rəy yazın...">
+                    <button onclick="sendReview()" class="btn-mini-share">Paylaş</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const _supabaseUrl = "https://sqgphrdkthiixeikialy.supabase.co"; 
+        const _supabaseKey = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+        const _supabase = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+        const params = new URLSearchParams(window.location.search);
+        const courseName = params.get('course') || "iyguk";
+
+        async function loadReviews() {
+            const container = document.getElementById('reviewsContainer');
+            const { data, error } = await _supabase
+                .from('course_reviews')
+                .select('*')
+                .eq('course_name', courseName)
+                .order('created_at', { ascending: false });
+
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(r => `
+                    <div class="review-card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                                ${r.user_email ? r.user_email[0].toUpperCase() : 'U'}
+                            </div>
+                            <h4 class="text-[11px] font-black">${r.user_email ? r.user_email.split('@')[0] : 'Anonim'}</h4>
+                        </div>
+                        <p class="text-[11px] opacity-80">${r.review_text}</p>
+                    </div>`).join('');
+            } else {
+                container.innerHTML = `<p class="text-xs opacity-50">Hələ rəy yoxdur.</p>`;
+            }
+        }
+
+        async function sendReview() {
+            const input = document.getElementById('miniReviewText');
+            const userStr = localStorage.getItem('loggedInUser');
+            if (!userStr || !input.value.trim()) return;
+
+            const user = JSON.parse(userStr);
+            const { error } = await _supabase.from('course_reviews').insert([{
+                course_name: courseName,
+                user_email: user.email,
+                review_text: input.value
+            }]);
+
+            if (!error) { input.value = ''; loadReviews(); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('mainTitle').textContent = courseName + " - Details";
+            document.getElementById('courseInfoTitle').textContent = courseName;
+            
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user) {
+                const name = user.email.split('@')[0];
+                document.getElementById('uEmail').textContent = name;
+                document.getElementById('uEmailSmall').textContent = name;
+                document.getElementById('uInit').textContent = user.email[0].toUpperCase();
+                document.getElementById('uInitSmall').textContent = user.email[0].toUpperCase();
+            }
+            loadReviews();
+        });
+    </script>
+</body>
+</html>

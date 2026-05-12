@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Admission Story — Learnihub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+            min-height: screen;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-input {
+            @apply w-full p-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400 text-slate-700 shadow-sm;
+        }
+
+        .section-header {
+            @apply flex items-center gap-3 mb-8 pt-6 border-t border-slate-100 first:border-t-0 first:pt-0;
+        }
+
+        .number-badge {
+            @apply flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-200;
+        }
+
+        .add-btn {
+            @apply flex items-center gap-2 text-indigo-600 font-bold text-sm hover:text-indigo-700 transition-colors bg-indigo-50 px-4 py-2 rounded-xl active:scale-95;
+        }
+    </style>
+</head>
+<body class="py-16 px-4">
+
+    <div class="max-w-4xl mx-auto glass-card rounded-[3rem] p-10 md:p-16 shadow-2xl">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Share Your <span class="text-indigo-600">Journey</span></h1>
+                <p class="text-slate-500 mt-3 text-lg">Your experience is a roadmap for future scholars.</p>
+            </div>
+            <a href="stories.html" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all text-sm uppercase tracking-wider">
+                Back to Stories
+            </a>
+        </header>
+
+        <form id="admissionStoryForm" class="space-y-12">
+            
+            <section>
+                <div class="section-header">
+                    <span class="number-badge">01</span>
+                    <h2 class="text-xl font-extrabold text-slate-800">Personal Identity</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Full Name *</label>
+                        <input type="text" id="fullName" required placeholder="e.g. Fatima Asadova" class="form-input">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Age *</label>
+                        <input type="number" id="age" required placeholder="19" class="form-input">
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Current Institution / High School *</label>
+                        <input type="text" id="schoolName" required placeholder="e.g. ADA University" class="form-input">
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-header">
+                    <span class="number-badge">02</span>
+                    <h2 class="text-xl font-extrabold text-slate-800">Academic Credentials</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Standardized Tests</label>
+                        <input type="text" id="exams" placeholder="IELTS: 8.0, SAT: 1520" class="form-input">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Preparation Duration</label>
+                        <input type="text" id="prepTime" placeholder="e.g. 1 year self-study" class="form-input">
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="number-badge">03</span>
+                        <h2 class="text-xl font-extrabold text-slate-800">Extracurricular Activities</h2>
+                    </div>
+                    <button type="button" onclick="addRow('extraList')" class="add-btn">
+                        <span>+ Add New</span>
+                    </button>
+                </div>
+                <div id="extraList" class="space-y-4">
+                    <input type="text" name="extra[]" placeholder="e.g. Founder of Coding Club" class="form-input">
+                </div>
+            </section>
+
+            <section>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="number-badge">04</span>
+                        <h2 class="text-xl font-extrabold text-slate-800">Honors & Awards</h2>
+                    </div>
+                    <button type="button" onclick="addRow('honorList')" class="add-btn">
+                        <span>+ Add New</span>
+                    </button>
+                </div>
+                <div id="honorList" class="space-y-4">
+                    <input type="text" name="honor[]" placeholder="e.g. National Math Olympiad Silver Medal" class="form-input">
+                </div>
+            </section>
+
+            <section>
+                <div class="section-header">
+                    <span class="number-badge">05</span>
+                    <h2 class="text-xl font-extrabold text-slate-800">Application Insight</h2>
+                </div>
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Applied Universities</label>
+                        <textarea id="appliedUnis" rows="2" placeholder="List the institutions you applied to..." class="form-input"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Acceptances & Final Choice</label>
+                        <textarea id="acceptedUnis" rows="2" placeholder="Where did you get in? Where are you going?" class="form-input"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-600 ml-1">Personal Statement & Essays</label>
+                            <textarea id="essayNotes" rows="4" placeholder="How was the writing process? What was your topic?" class="form-input"></textarea>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-600 ml-1">Interviews & Advice</label>
+                            <textarea id="interviewNotes" rows="4" placeholder="Any interview invites? Experience and tips..." class="form-input"></textarea>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-600 ml-1">Recommendations for Applicants</label>
+                        <textarea id="tips" rows="3" placeholder="What is the most important thing to know?" class="form-input"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pt-10">
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-5 rounded-[2rem] hover:bg-indigo-700 shadow-2xl shadow-indigo-200 transition-all hover:scale-[1.02] active:scale-[0.98] text-lg">
+                    Publish My Story
+                </button>
+            </div>
+        </form>
+    </div>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script> ```
+    <script>
+        const _supabase = supabase.createClient("https://sqgphrdkthiixeikialy.supabase.co", "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq");
+
+        function addRow(containerId) {
+            const container = document.getElementById(containerId);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = containerId === 'extraList' ? 'extra[]' : 'honor[]';
+            input.className = 'form-input mt-2';
+            input.placeholder = "Enter next entry...";
+            container.appendChild(input);
+        }
+
+        document.getElementById('admissionStoryForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+
+            const extras = Array.from(document.getElementsByName('extra[]')).map(i => i.value).filter(v => v);
+            const honors = Array.from(document.getElementsByName('honor[]')).map(i => i.value).filter(v => v);
+
+            const { error } = await _supabase.from('stories').insert([{
+                author_name: document.getElementById('fullName').value,
+                age: parseInt(document.getElementById('age').value),
+                school_name: document.getElementById('schoolName').value,
+                exams: document.getElementById('exams').value,
+                prep_time: document.getElementById('prepTime').value,
+                extracurriculars: extras,
+                honors: honors,
+                applied_unis: document.getElementById('appliedUnis').value,
+                accepted_unis: document.getElementById('acceptedUnis').value,
+                essay_notes: document.getElementById('essayNotes').value,
+                interview_notes: document.getElementById('interviewNotes').value,
+                tips: document.getElementById('tips').value
+            }]);
+
+            if (!error) {
+                alert("Congratulations! Your story has been successfully published.");
+                window.location.href = 'stories.html';
+            } else {
+                alert("Error: " + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Publish My Story";
+            }
+        };
+    </script>
+</body>
+</html>

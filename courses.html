@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses — Learnihub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F8F3E9; 
+            color: #1e293b;
+        }
+
+        .sidebar-border { border-right: 1.5px solid #E2E8F0; }
+
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 16px; margin-bottom: 8px;
+            border-radius: 14px; font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s; color: #64748b;
+        }
+
+        .nav-link:hover { background-color: #f1f5f9; color: #6366f1; }
+        .nav-link-active { background-color: #D6CADD; color: #2D2D2D !important; border: 2px solid #2D2D2D; }
+
+        .course-card {
+            background-color: #FFF9F0; 
+            border: 2px solid #2D2D2D; 
+            border-radius: 28px;
+            display: flex; 
+            flex-direction: column; 
+            height: auto; 
+            min-height: 480px;
+            width: 100%;
+            max-width: 450px; 
+            margin: 0 auto;
+            position: relative; 
+            padding: 28px;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+
+        .course-card:hover { transform: translateY(-4px); }
+
+        .neo-input { background: white; border: 2px solid #2D2D2D; border-radius: 18px; color: #1A1A1A; }
+
+        #userDropdown {
+            display: none; position: absolute; bottom: calc(100% + 10px); left: 0;
+            width: 100%; background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 6px; z-index: 50;
+        }
+        #userDropdown.show { display: block; }
+
+        .cat-badge { border: 2px solid #2D2D2D; border-radius: 10px; padding: 4px 10px; font-size: 9px; font-weight: 800; }
+
+        #userAccountBtn { background-color: #D1FAE5; border: 2px solid #2D2D2D; border-radius: 9999px; }
+
+        .btn-view-link { 
+            background-color: #D6CADD; border: 2px solid #2D2D2D; border-radius: 12px; 
+            display: block; text-align: center; font-size: 9px; font-weight: 900;
+            padding: 10px; transition: all 0.2s;
+        }
+
+        .info-box { 
+            background-color: #D6CADD; border: 2px solid #2D2D2D; border-radius: 10px; 
+            padding: 5px 8px; text-align: center;
+        }
+
+        .top-submission-bar { background-color: #F8F3E9; padding: 30px 20px 10px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        .submission-btn { background-color: #D6CADD; border: 2.5px solid #2D2D2D; border-radius: 50px; padding: 8px 35px; font-weight: 800; font-size: 13px; color: #2D2D2D; text-transform: uppercase; }
+        
+        .break-text {
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row">
+
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-transparent md:sticky md:top-0 z-40 sidebar-border">
+        <h2 class="text-xl font-black text-slate-900 mb-10 tracking-tighter px-2">LEARNIHUB<span class="text-indigo-600"></span></h2>
+        
+        <nav class="flex-1">
+            <a href="index.html" class="nav-link"><span data-key="nav_home">Ana Səhifə</span></a>
+            <a href="courses.html" class="nav-link nav-link-active"><span data-key="nav_courses">Kurslarım</span></a>
+            <a href="survey.html" class="nav-link"><span data-key="nav_survey">Kurs Təklif Et</span></a>
+        </nav>
+
+        <div class="space-y-6">
+            <div class="px-2">
+                <div class="bg-white/50 p-1 rounded-xl flex gap-1 border-2 border-slate-900">
+                    <button id="btnAz" onclick="changeLanguage('az')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">AZ</button>
+                    <button id="btnEn" onclick="changeLanguage('en')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">EN</button>
+                </div>
+            </div>
+
+            <div class="relative px-2">
+                <div id="userDropdown">
+                    <a href="profile.html" class="block p-2 text-[10px] font-bold hover:bg-slate-50 rounded-lg"><span data-key="nav_profile">PROFİL</span></a>
+                    <button id="logoutBtnInside" class="text-red-500 block p-2 text-[10px] font-bold w-full text-left hover:bg-red-50 rounded-lg"><span data-key="btn_logout">ÇIXIŞ</span></button>
+                </div>
+                <button id="userAccountBtn" class="w-full flex items-center gap-2.5 p-2 text-slate-900">
+                    <div class="w-7 h-7 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center font-black text-[9px]">U</div>
+                    <p id="userEmailDisplay" class="text-[9px] font-bold truncate uppercase tracking-wider">YÜKLƏNİR...</p>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1">
+        <div class="top-submission-bar">
+            <div class="submission-btn" data-key="nav_courses_title">KURSLAR</div>
+            <p class="text-slate-500 text-[11px] font-bold mt-2" data-key="courses_subtitle">Kursları axtarın və siyahınıza əlavə edin.</p>
+        </div>
+
+        <div class="p-6 lg:p-10 max-w-7xl mx-auto"> 
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="sm:col-span-2 md:col-span-3">
+                    <input type="text" id="searchInput" oninput="filterCourses()" placeholder="Axtar..." class="w-full px-5 py-4 neo-input outline-none font-bold text-xs">
+                </div>
+                <div class="relative">
+                    <select id="categorySelect" onchange="filterCourses()" class="w-full px-5 py-4 neo-input outline-none font-bold text-xs cursor-pointer appearance-none">
+                        <option value="all" data-key="cat_all">Bütün Kateqoriyalar</option>
+                        <option value="Internship" data-key="cat_intern">Təcrübə</option>
+                        <option value="Summer Program" data-key="cat_summer">Yay Proqramı</option>
+                        <option value="Mathematics" data-key="cat_math">Riyaziyyat</option>
+                        <option value="Programming" data-key="cat_prog">Proqramlaşdırma</option>
+                        <option value="General" data-key="cat_general">Ümumi</option>
+                    </select>
+                </div>
+            </div>
+            <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
+        </div>
+    </main>
+
+    <script>
+        const SUBAPASE_URL = "https://sqgphrdkthiixeikialy.supabase.co"; 
+        const SUPABASE_KEY = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+        const _supabase = supabase.createClient(SUBAPASE_URL, SUPABASE_KEY);
+
+        let allCourses = [];
+        const translations = {
+            az: {
+                nav_home: "Ana Səhifə", nav_courses: "Kurslarım", nav_survey: "Kurs Təklif Et", nav_courses_title: "KURSLAR",
+                nav_profile: "PROFİL", btn_logout: "ÇIXIŞ", added_text: "ƏLAVƏ EDİLDİ", price_label: "QIYMƏT", 
+                deadline_label: "SON TARİX", btn_view: "KURSA BAX →", free_text: "Pulsuz",
+                search_placeholder: "Axtar...", cat_all: "Bütün Kateqoriyalar", cat_intern: "Təcrübə",
+                cat_summer: "Yay Proqramı", cat_math: "Riyaziyyat", cat_prog: "Proqramlaşdırma",
+                cat_general: "Ümumi", courses_subtitle: "Kursları axtarın və siyahınıza əlavə edin."
+            },
+            en: {
+                nav_home: "Home Page", nav_courses: "My Courses", nav_survey: "Submit Course", nav_courses_title: "COURSES",
+                nav_profile: "PROFILE", btn_logout: "LOGOUT", added_text: "ADDED", price_label: "PRICE", 
+                deadline_label: "DEADLINE", btn_view: "VIEW COURSE →", free_text: "Free",
+                search_placeholder: "Search...", cat_all: "All Categories", cat_intern: "Internship",
+                cat_summer: "Summer Program", cat_math: "Mathematics", cat_prog: "Programming",
+                cat_general: "General", courses_subtitle: "Search and add courses to your list."
+            }
+        };
+
+        const softColors = ['#E0F2FE', '#FFEDD5', '#F1F5F9', '#ECFDF5', '#FDF2F8', '#EEF2FF'];
+
+        async function fetchCourses() {
+            try {
+                const { data, error } = await _supabase.from('courses').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error("Məlumat gəlmədi:", error.message);
+                    return;
+                }
+                allCourses = data || [];
+                filterCourses();
+            } catch (err) {
+                console.error("Bağlantı xətası:", err);
+            }
+        }
+
+        function filterCourses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categorySelect').value;
+
+            const filtered = allCourses.filter(c => {
+                const titleAz = (c.title_az || c.title || "").toLowerCase();
+                const titleEn = (c.title_en || "").toLowerCase();
+                const matchesSearch = titleAz.includes(searchTerm) || titleEn.includes(searchTerm);
+                
+                const courseCat = String(c.category || '').trim();
+                const matchesCategory = (category === 'all' || courseCat === category);
+                
+                return matchesSearch && matchesCategory;
+            });
+            renderCourses(filtered);
+        }
+
+        function renderCourses(courses) {
+            const grid = document.getElementById('coursesGrid');
+            if (courses.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 font-bold text-slate-400">Kurs tapılmadı və ya yüklənir...</div>`;
+                return;
+            }
+
+            const lang = localStorage.getItem('preferredLang') || 'en';
+            const t = translations[lang];
+            const selected = JSON.parse(localStorage.getItem('selectedCourses')) || [];
+            
+            grid.innerHTML = courses.map((course, index) => {
+                const title = (lang === 'en' ? (course.title_en || course.title) : (course.title_az || course.title)) || 'Adsız';
+                const desc = (lang === 'en' ? course.description_en : course.description_az) || (course.description || '');
+                const isAdded = selected.includes(String(course.id));
+                
+                let displayPrice = course.price || t.free_text;
+                if (!course.price || course.price.toLowerCase() === 'pulsuz' || course.price.toLowerCase() === 'free') {
+                    displayPrice = t.free_text;
+                }
+
+                let displayCat = course.category || (lang === 'en' ? 'General' : 'Ümumi');
+                const rawCat = String(course.category || '').trim().toLowerCase();
+
+                if (rawCat.includes('internship')) displayCat = t.cat_intern;
+                else if (rawCat.includes('summer program')) displayCat = t.cat_summer;
+                else if (rawCat.includes('mathematics')) displayCat = t.cat_math;
+                else if (rawCat.includes('programming')) displayCat = t.cat_prog;
+                else if (rawCat.includes('general')) displayCat = t.cat_general;
+
+                return `
+                <div class="course-card">
+                    <button onclick="toggleDashboard('${course.id}')" class="absolute top-6 right-6 z-10">
+                        ${isAdded ? 
+                            `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border-2 border-slate-900">${t.added_text}</span>` : 
+                            `<div class="w-8 h-8 bg-white border-2 border-slate-900 rounded-full flex items-center justify-center hover:bg-emerald-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </div>`
+                        }
+                    </button>
+                    
+                    <div class="mb-4">
+                        <span class="cat-badge uppercase" style="background-color: ${softColors[index % 6]}">
+                            ${displayCat}
+                        </span>
+                    </div>
+                    
+                    <div class="w-full h-auto mb-6">
+                        <h3 class="text-xl font-black text-slate-900 leading-tight mb-4 break-text" style="max-width: 80%">${title}</h3>
+                        <p class="text-slate-600 text-[11px] font-bold leading-relaxed block overflow-visible h-auto break-text">
+                            ${desc}
+                        </p>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t-2 border-dashed border-slate-200">
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="info-box">
+                                <span class="text-[7px] text-slate-500 font-black uppercase block mb-0.5">${t.price_label}</span>
+                                <p class="text-[10px] font-black">${displayPrice}</p>
+                            </div>
+                            <div class="info-box" style="border-color: #ef444444">
+                                <span class="text-[7px] text-red-500 font-black uppercase block mb-0.5">${t.deadline_label}</span>
+                                <p class="text-[9px] font-black">${course.deadline || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <a href="${course.link || '#'}" target="_blank" class="w-full btn-view-link text-slate-900 py-3 uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5">${t.btn_view}</a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleDashboard(courseId) {
+            let selected = JSON.parse(localStorage.getItem('selectedCourses')) || [];
+            const idStr = String(courseId);
+            if (!selected.includes(idStr)) { selected.push(idStr); } 
+            else { selected = selected.filter(id => id !== idStr); }
+            localStorage.setItem('selectedCourses', JSON.stringify(selected));
+            filterCourses();
+        }
+
+        async function checkUser() {
+            try {
+                const { data: { session } } = await _supabase.auth.getSession();
+                if (session) { 
+                    document.getElementById('userEmailDisplay').textContent = session.user.email.split('@')[0]; 
+                } else { 
+                    document.getElementById('userEmailDisplay').textContent = "QONAQ";
+                }
+            } catch (e) {
+                document.getElementById('userEmailDisplay').textContent = "ERROR";
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('preferredLang', lang);
+            updateStaticUI();
+            updateLangButtons(lang);
+            filterCourses(); 
+        }
+
+        function updateLangButtons(lang) {
+            const btnAz = document.getElementById('btnAz');
+            const btnEn = document.getElementById('btnEn');
+            if (lang === 'az') {
+                btnAz.className = "flex-1 py-1.5 text-[9px] font-black rounded-lg bg-white border-2 border-slate-900";
+                btnEn.className = "flex-1 py-1.5 text-[9px] font-bold text-slate-400";
+            } else {
+                btnEn.className = "flex-1 py-1.5 text-[9px] font-black rounded-lg bg-white border-2 border-slate-900";
+                btnAz.className = "flex-1 py-1.5 text-[9px] font-bold text-slate-400";
+            }
+        }
+
+        function updateStaticUI() {
+            const lang = localStorage.getItem('preferredLang') || 'en';
+            const t = translations[lang];
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) el.textContent = t[key];
+            });
+            document.getElementById('searchInput').placeholder = t.search_placeholder;
+        }
+
+        document.getElementById('logoutBtnInside').onclick = async () => {
+            await _supabase.auth.signOut();
+            localStorage.removeItem('loggedInUser'); // survey.html-dəki ilə eyniləşdirildi
+            window.location.href = 'login.html';
+        };
+
+        const userBtn = document.getElementById('userAccountBtn');
+        const userDrop = document.getElementById('userDropdown');
+        userBtn.onclick = (e) => { e.stopPropagation(); userDrop.classList.toggle('show'); };
+        document.onclick = () => userDrop.classList.remove('show');
+
+        window.onload = () => { 
+            const savedLang = localStorage.getItem('preferredLang') || 'en';
+            updateStaticUI();
+            updateLangButtons(savedLang);
+            checkUser(); 
+            fetchCourses(); 
+        };
+    </script>
+</body>
+</html>

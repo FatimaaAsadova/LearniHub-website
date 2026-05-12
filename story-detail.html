@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEARNIHUB | Story Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #fdf8f8; scroll-behavior: smooth; }
+        
+        /* Sol menyu xətti və aktivlik rəngi */
+        .sidebar-item {
+            position: relative;
+            padding-left: 1.5rem;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+
+        /* Skrol zamanı aktiv olan hissə (Mavi xətt) */
+        .sidebar-item.active {
+            color: #3b82f6 !important;
+            font-weight: 700;
+        }
+
+        /* İndikator xətti */
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #e5e7eb; /* Normal halda boz xətt */
+            border-radius: 2px;
+        }
+
+        .sidebar-item.active::before {
+            background-color: #3b82f6; /* Aktiv olanda mavi xətt */
+        }
+
+        .content-section {
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+            min-height: 50vh;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800">
+
+    <nav class="max-w-6xl mx-auto p-6">
+        <a href="stories.html" class="text-gray-500 hover:text-blue-600 flex items-center gap-2 transition text-sm font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to All Stories
+        </a>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-4 grid grid-cols-12 gap-12">
+        
+        <aside class="col-span-3 hidden md:block sticky top-12 h-fit">
+            <nav class="space-y-6">
+                <a href="#intro" class="sidebar-item active block text-sm">Introduction and Background</a>
+                <a href="#academics" class="sidebar-item block text-sm">Academics and stats</a>
+                <a href="#awards" class="sidebar-item block text-sm">Awards/honors</a>
+                <a href="#extracurriculars" class="sidebar-item block text-sm">Extracurriculars</a>
+                <a href="#decisions" class="sidebar-item block text-sm">My College Decisions</a>
+            </nav>
+        </aside>
+
+        <section class="col-span-12 md:col-span-9">
+            
+            <header class="mb-12">
+                <p class="text-gray-400 text-xs font-medium mb-4 uppercase tracking-wider">April 18, 2026</p>
+                
+                <div class="w-full mb-8 rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+                    <img src="universitet-banner.png" alt="University Campus" class="w-full h-auto min-h-[300px] object-cover bg-gray-100">
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 tracking-tight">
+                    From Bukhara to Stanford: How research and passion led me to T10s
+                </h1>
+                <div class="mt-8 border-b border-gray-100"></div>
+            </header>
+
+            <div id="intro" class="content-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Introduction and Background</h2>
+                <div class="prose max-w-none text-gray-600 leading-relaxed space-y-4">
+                    <p>I am coming from the public school in Bukhara. I am 16 years old and an 8th-generation gold embroidery craftsperson in my family lineage.</p>
+                    <p>I spent my entire childhood in our workshop museum. This environment taught me the value of heritage and persistence from a very young age.</p>
+                </div>
+            </div>
+
+            <div id="academics" class="content-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Academics and stats</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">GPA</p>
+                        <p class="text-2xl font-bold text-blue-600">4.0 / 4.0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">SAT Score</p>
+                        <p class="text-2xl font-bold text-blue-600">1550+</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="awards" class="content-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Awards/honors</h2>
+                <ul class="space-y-4 text-gray-600">
+                    <li class="flex items-start gap-3">
+                        <span class="text-blue-500 mt-1">✦</span>
+                        <span>International Math Tournament Gold Medalist</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-blue-500 mt-1">✦</span>
+                        <span>National Research Scholar 2025</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="extracurriculars" class="content-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Extracurriculars</h2>
+                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Founder of Silk Orbit</h3>
+                    <p class="text-blue-800/80 leading-relaxed">
+                        Helping students connect with global research opportunities and bridging the gap between traditional craft and modern technology.
+                    </p>
+                </div>
+            </div>
+
+            <div id="decisions" class="content-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">My College Decisions</h2>
+                <div class="p-6 bg-white border border-gray-100 rounded-3xl flex items-center shadow-md">
+                    <div class="h-16 w-16 bg-green-50 rounded-2xl flex items-center justify-center text-3xl mr-6">
+                        🌲
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-tighter">Accepted</p>
+                        <p class="text-xl font-black text-gray-900">Stanford University</p>
+                        <p class="text-green-600 font-semibold italic">Full Financial Aid</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // ScrollSpy Funksiyası
+        const sections = document.querySelectorAll(".content-section");
+        const navItems = document.querySelectorAll(".sidebar-item");
+
+        const options = {
+            root: null,
+            rootMargin: '-20% 0px -40% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute("id");
+                    navItems.forEach(item => {
+                        item.classList.remove("active");
+                        if (item.getAttribute("href") === `#${id}`) {
+                            item.classList.add("active");
+                        }
+                    });
+                }
+            });
+        }, options);
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>

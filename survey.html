@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Course — Learnihub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/az.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F8F3E9; 
+            color: #1e293b;
+        }
+
+        .sidebar-border { border-right: 1.5px solid #E2E8F0; }
+
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 16px; margin-bottom: 8px;
+            border-radius: 14px; font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s; color: #64748b;
+        }
+
+        .nav-link:hover { background-color: #f1f5f9; color: #6366f1; }
+        .nav-link-active { background-color: #D6CADD; color: #2D2D2D !important; border: 2px solid #2D2D2D; }
+
+        .form-card { background: #FDFCF8; border: 2px solid #2D2D2D; border-radius: 32px; }
+
+        .input-field {
+            width: 100%; padding: 18px 24px; border: 2px solid #2D2D2D; border-radius: 20px;
+            outline: none; transition: all 0.3s; font-size: 14px; font-weight: 700;
+            color: #1A1A1A; background-color: white;
+        }
+
+        #userAccountBtn { background-color: #D1FAE5; border: 2px solid #2D2D2D; border-radius: 9999px; }
+
+        .btn-submit { background-color: #2D2D2D; color: white; border: 2px solid #2D2D2D; font-weight: 800; transition: all 0.2s; }
+        .btn-submit:active { transform: scale(0.98); }
+
+        .top-submission-bar { background-color: #F8F3E9; padding: 30px 20px 10px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        .submission-btn-top { background-color: #D6CADD; border: 2.5px solid #2D2D2D; border-radius: 50px; padding: 8px 35px; font-weight: 800; font-size: 13px; color: #2D2D2D; text-transform: uppercase; }
+
+        #userDropdown {
+            display: none; position: absolute; bottom: calc(100% + 10px); left: 0;
+            width: 100%; background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 6px; z-index: 50;
+        }
+        #userDropdown.show { display: block; }
+
+        .flatpickr-calendar {
+            border: 2px solid #2D2D2D !important;
+            border-radius: 18px !important;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row">
+
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-transparent md:sticky md:top-0 z-40 sidebar-border">
+        <h2 class="text-xl font-black text-slate-900 mb-10 tracking-tighter px-2">
+            <a href="index.html">LEARNIHUB<span class="text-indigo-600"></span></a>
+        </h2>
+        
+        <nav class="flex-1">
+            <a href="index.html" class="nav-link"><span data-key="nav_home">Home Page</span></a>
+            <a href="courses.html" class="nav-link"><span data-key="nav_courses">My Courses</span></a>
+            <a href="survey.html" class="nav-link nav-link-active"><span data-key="nav_survey">Submit Course</span></a>
+        </nav>
+
+        <div class="space-y-6">
+            <div class="px-2">
+                <div class="bg-white/50 p-1 rounded-xl flex gap-1 border-2 border-slate-900">
+                    <button id="btnAz" onclick="toggleLang('az')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">AZ</button>
+                    <button id="btnEn" onclick="toggleLang('en')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">EN</button>
+                </div>
+            </div>
+
+            <div class="relative px-2">
+                <div id="userDropdown">
+                    <a href="profile.html" class="block p-2 text-[10px] font-bold hover:bg-slate-50 rounded-lg" data-key="nav_profile">PROFILE</a>
+                    <button id="logoutBtn" class="text-red-500 block p-2 text-[10px] font-bold w-full text-left hover:bg-red-50 rounded-lg" data-key="btn_logout">LOGOUT</button>
+                </div>
+                <button id="userAccountBtn" class="w-full flex items-center gap-2.5 p-2 text-slate-900">
+                    <div class="w-7 h-7 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center font-black text-[9px]">U</div>
+                    <p id="userEmailDisplay" class="text-[9px] font-bold truncate flex-1 text-left uppercase">Yüklənir...</p>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1">
+        <div class="top-submission-bar">
+            <div class="submission-btn-top" data-key="badge">COURSE SUBMISSION</div>
+            <p class="text-slate-500 text-[11px] font-bold mt-2" data-key="subtitle">Share educational resources with us to enrich our platform.</p>
+        </div>
+
+        <div class="p-6 lg:p-12 max-w-3xl mx-auto">
+            <div class="form-card p-8 md:p-12">
+                <div id="message" class="hidden"></div>
+                <form id="surveyForm" class="space-y-8">
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelName">COURSE NAME *</label>
+                        <input type="text" id="course_name" class="input-field" required>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelLink">COURSE LINK (URL) *</label>
+                        <input type="url" id="course_link" class="input-field" required placeholder="https://...">
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelCategory">CATEGORY *</label>
+                        <select id="category" class="input-field appearance-none cursor-pointer" required>
+                            <option value="" data-key="optCat">Select Category...</option>
+                            <option value="Internship" data-key="cat_intern">Internship</option>
+                            <option value="Summer Program" data-key="cat_summer">Summer Program</option>
+                            <option value="Programming" data-key="cat_prog">Programming</option>
+                            <option value="Mathematics" data-key="cat_math">Mathematics</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelDeadline">DEADLINE</label>
+                        <input type="text" id="deadline" class="input-field" placeholder="DD.MM.YYYY">
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelDesc">DESCRIPTION & NOTES *</label>
+                        <textarea id="description" rows="6" class="input-field resize-none" required></textarea>
+                    </div>
+
+                    <div class="flex pt-4">
+                        <button type="submit" id="submitBtn" class="w-full py-5 btn-submit rounded-2xl text-[12px] uppercase tracking-widest" data-key="btnSubmit">
+                            Submit Course
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const _supabaseUrl = "https://sqgphrdkthiixeikialy.supabase.co"; 
+        const _supabaseKey = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+        const _supabase = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+        let fp;
+
+        const translations = {
+            az: {
+                nav_home: "Ana Səhifə", nav_courses: "Kurslarım", nav_survey: "Kurs Təklif Et",
+                nav_profile: "PROFİL", btn_logout: "ÇIXIŞ",
+                badge: "Kurs Təklifi",
+                subtitle: "Platformamızı zənginləşdirmək üçün təhsil resurslarını bizimlə paylaşın.",
+                labelName: "KURSUN ADI *", labelLink: "KURSUN LİNKİ (URL) *", labelCategory: "KATEQORİYA *", 
+                optCat: "Kateqoriya seçin...", labelDeadline: "SON TARİX", labelDesc: "TƏSVİR VƏ QEYDLƏR *",
+                btnSubmit: "Kursu Göndər",
+                ph_name: "Məs: Full-stack İnkişaf", ph_desc: "Kurs haqqında daha çox məlumat verin...",
+                cat_intern: "Təcrübə Proqramı", cat_summer: "Yay Proqramı", cat_prog: "Proqramlaşdırma", cat_math: "Riyaziyyat"
+            },
+            en: {
+                nav_home: "Home Page", nav_courses: "My Courses", nav_survey: "Submit Course",
+                nav_profile: "PROFILE", btn_logout: "LOGOUT",
+                badge: "Course Submission",
+                subtitle: "Share educational resources with us to enrich our platform.",
+                labelName: "COURSE NAME *", labelLink: "COURSE LINK (URL) *", labelCategory: "CATEGORY *", 
+                optCat: "Select Category...", labelDeadline: "DEADLINE", labelDesc: "DESCRIPTION & NOTES *",
+                btnSubmit: "Submit Course",
+                ph_name: "Ex: Full-stack Development", ph_desc: "Tell us more about the course...",
+                cat_intern: "Internship", cat_summer: "Summer Program", cat_prog: "Programming", cat_math: "Mathematics"
+            }
+        };
+
+        function initFlatpickr(lang) {
+            if (fp) fp.destroy();
+            fp = flatpickr("#deadline", {
+                locale: lang === 'az' ? "az" : "default",
+                dateFormat: "d.m.Y", // İstifadəçi daxil edən format
+                allowInput: true
+            });
+        }
+
+        function updateUI(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            document.getElementById('course_name').placeholder = t.ph_name;
+            document.getElementById('description').placeholder = t.ph_desc;
+            
+            initFlatpickr(lang);
+
+            const btnAz = document.getElementById('btnAz');
+            const btnEn = document.getElementById('btnEn');
+            if (lang === 'az') {
+                btnAz.className = "flex-1 py-1.5 text-[9px] font-black rounded-lg bg-white border-2 border-slate-900";
+                btnEn.className = "flex-1 py-1.5 text-[9px] font-bold text-slate-400";
+            } else {
+                btnEn.className = "flex-1 py-1.5 text-[9px] font-black rounded-lg bg-white border-2 border-slate-900";
+                btnAz.className = "flex-1 py-1.5 text-[9px] font-bold text-slate-400";
+            }
+        }
+
+        function toggleLang(lang) { localStorage.setItem('preferredLang', lang); updateUI(lang); }
+
+        document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            const lang = localStorage.getItem('preferredLang') || 'en';
+            
+            // Tarix formatlama hissəsi
+            const rawDeadline = document.getElementById('deadline').value; // Məsələn: "13.02.2008"
+            let formattedDeadline = null;
+
+            if (rawDeadline) {
+                const parts = rawDeadline.split('.');
+                if (parts.length === 3) {
+                    // "13.02.2008" -> "2008-02-13" formatına çevirir
+                    formattedDeadline = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                } else {
+                    // Əgər format Flatpickr vasitəsilə artıq YYYY-MM-DD-dirsə
+                    formattedDeadline = rawDeadline;
+                }
+            }
+
+            const payload = {
+                course_name: document.getElementById('course_name').value.trim(),
+                course_link: document.getElementById('course_link').value.trim(),
+                category: document.getElementById('category').value,
+                deadline: formattedDeadline, // Artıq düzgün formatdadır
+                description: document.getElementById('description').value.trim(),
+                created_at: new Date().toISOString()
+            };
+
+            const { error } = await _supabase.from('survey_submissions').insert([payload]);
+
+            if (error) {
+                console.error("Supabase Error:", error);
+                showMessage(lang === 'az' ? "Xəta baş verdi: " + error.message : "Error: " + error.message, "red");
+            } else {
+                showMessage(lang === 'az' ? "Kurs uğurla göndərildi!" : "Course submitted successfully!", "green");
+                e.target.reset();
+                if (fp) fp.clear();
+            }
+            submitBtn.disabled = false;
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerText = text;
+            messageDiv.className = `p-4 rounded-2xl text-[10px] font-black text-center mb-6 border-2 ${type === 'red' ? 'bg-red-50 text-red-600 border-red-600' : 'bg-emerald-50 text-emerald-600 border-emerald-600'}`;
+            messageDiv.classList.remove('hidden');
+        }
+
+        document.getElementById('logoutBtn').onclick = async () => {
+            await _supabase.auth.signOut();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        };
+
+        const userBtn = document.getElementById('userAccountBtn');
+        const userDrop = document.getElementById('userDropdown');
+        userBtn.onclick = (e) => { e.stopPropagation(); userDrop.classList.toggle('show'); };
+        document.onclick = () => userDrop.classList.remove('show');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLang') || 'en';
+            updateUI(savedLang);
+            const localUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (localUser) document.getElementById('userEmailDisplay').textContent = localUser.email.split('@')[0];
+        });
+    </script>
+</body>
+</html>
