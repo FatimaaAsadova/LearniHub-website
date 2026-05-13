@@ -54,6 +54,16 @@
     @media (max-width: 640px) {
       .auth-card { border-radius: 30px; padding: 1.5rem !important; }
     }
+
+    /* Göz işarəsi üçün əlavə stil */
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #71717a;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col text-gray-900">
@@ -85,12 +95,20 @@
           <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2" data-key="labelEmail">E-POÇT ÜNVANI</label>
           <input type="email" id="email" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
         </div>
-        <div class="relative">
+        <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest" data-key="labelPass">ŞİFRƏ</label>
             <button type="button" onclick="openModal()" class="text-[10px] font-bold text-[#5e4d74] hover:underline uppercase tracking-widest" data-key="forgotBtn">Şifrəni unutmusunuz?</button>
           </div>
-          <input type="password" id="password" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+          <div class="relative">
+            <input type="password" id="password" class="input-style w-full px-4 py-3.5 rounded-2xl text-sm font-semibold" required>
+            <span class="password-toggle" onclick="togglePasswordVisibility('password')">
+              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </span>
+          </div>
         </div>
         <div id="loginMessage" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
         <button type="submit" id="loginBtn" class="btn-panel w-full font-bold py-4 transition-all text-sm uppercase tracking-[2px]" data-key="loginBtn">Daxil ol</button>
@@ -121,6 +139,19 @@
   </div>
 
   <script>
+    // Şifrəni göstər/gizlə funksiyası
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = event.currentTarget.querySelector('svg');
+      if (input.type === "password") {
+        input.type = "text";
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.822 7.822L21 21m-2.278-2.278L15.071 15.07M14.25 14.25a3 3 0 11-4.243-4.243m4.243 4.243L10.007 10.007" />';
+      } else {
+        input.type = "password";
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+      }
+    }
+
     const translations = {
       az: {
         navBack: "Geri qayıt", headerRegBtn: "Qeydiyyat", loginTitle: "Daxil olun", loginSub: "Giriş etmək üçün məlumatlarınızı daxil edin.",
@@ -224,7 +255,7 @@
       btn.disabled = true;
       btn.innerText = "...";
 
-      const redirectUrl = window.location.origin + '/reset-password.html';
+      const redirectUrl = 'https://learni-hub-website-pcpr.vercel.app/reset-password.html';
 
       const { error } = await supabaseClient.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: redirectUrl,
