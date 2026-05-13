@@ -33,15 +33,17 @@
             display: flex; 
             flex-direction: column; 
             height: auto; 
-            min-height: 480px;
+            min-height: 420px;
             width: 100%;
-            max-width: 450px; 
-            margin: 0 auto;
             position: relative; 
-            padding: 28px;
+            padding: 24px;
             box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.05);
             transition: transform 0.2s;
             overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .course-card { min-height: 480px; padding: 28px; }
         }
 
         .course-card:hover { transform: translateY(-4px); }
@@ -69,7 +71,9 @@
             padding: 5px 8px; text-align: center;
         }
 
-        .top-submission-bar { background-color: #F8F3E9; padding: 30px 20px 10px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        .top-submission-bar { background-color: #F8F3E9; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        @media (min-width: 768px) { .top-submission-bar { padding: 30px 20px 10px 20px; } }
+
         .submission-btn { background-color: #D6CADD; border: 2.5px solid #2D2D2D; border-radius: 50px; padding: 8px 35px; font-weight: 800; font-size: 13px; color: #2D2D2D; text-transform: uppercase; }
         
         .break-text {
@@ -77,12 +81,25 @@
             overflow-wrap: anywhere;
             word-break: break-word;
         }
+
+        /* Mobile Menu */
+        .mobile-nav { border-bottom: 1.5px solid #E2E8F0; background: #F8F3E9; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
-    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-transparent md:sticky md:top-0 z-40 sidebar-border">
-        <h2 class="text-xl font-black text-slate-900 mb-10 tracking-tighter px-2">LEARNIHUB<span class="text-indigo-600"></span></h2>
+    <div class="md:hidden flex items-center justify-between p-4 mobile-nav sticky top-0 z-50">
+        <h2 class="text-lg font-black text-slate-900 tracking-tighter">LEARNIHUB</h2>
+        <button onclick="toggleSidebar()" class="p-2 border-2 border-slate-900 rounded-lg bg-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-[#F8F3E9] md:bg-transparent fixed md:sticky top-0 z-40 sidebar-border overflow-y-auto">
+        <div class="flex justify-between items-center mb-10 md:block">
+            <h2 class="text-xl font-black text-slate-900 tracking-tighter px-2">LEARNIHUB</h2>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-900 font-bold">X</button>
+        </div>
         
         <nav class="flex-1">
             <a href="index.html" class="nav-link"><span data-key="nav_home">Ana Səhifə</span></a>
@@ -90,7 +107,7 @@
             <a href="survey.html" class="nav-link"><span data-key="nav_survey">Kurs Təklif Et</span></a>
         </nav>
 
-        <div class="space-y-6">
+        <div class="space-y-6 mt-10 md:mt-0">
             <div class="px-2">
                 <div class="bg-white/50 p-1 rounded-xl flex gap-1 border-2 border-slate-900">
                     <button id="btnAz" onclick="changeLanguage('az')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">AZ</button>
@@ -98,7 +115,7 @@
                 </div>
             </div>
 
-            <div class="relative px-2">
+            <div class="relative px-2 mb-4">
                 <div id="userDropdown">
                     <a href="profile.html" class="block p-2 text-[10px] font-bold hover:bg-slate-50 rounded-lg"><span data-key="nav_profile">PROFİL</span></a>
                     <button id="logoutBtnInside" class="text-red-500 block p-2 text-[10px] font-bold w-full text-left hover:bg-red-50 rounded-lg"><span data-key="btn_logout">ÇIXIŞ</span></button>
@@ -114,12 +131,12 @@
     <main class="flex-1">
         <div class="top-submission-bar">
             <div class="submission-btn" data-key="nav_courses_title">KURSLAR</div>
-            <p class="text-slate-500 text-[11px] font-bold mt-2" data-key="courses_subtitle">Kursları axtarın və siyahınıza əlavə edin.</p>
+            <p class="text-slate-500 text-[11px] font-bold mt-2 text-center" data-key="courses_subtitle">Kursları axtarın və siyahınıza əlavə edin.</p>
         </div>
 
-        <div class="p-6 lg:p-10 max-w-7xl mx-auto"> 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                <div class="sm:col-span-2 md:col-span-3">
+        <div class="p-4 md:p-6 lg:p-10 max-w-7xl mx-auto"> 
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+                <div class="md:col-span-3">
                     <input type="text" id="searchInput" oninput="filterCourses()" placeholder="Axtar..." class="w-full px-5 py-4 neo-input outline-none font-bold text-xs">
                 </div>
                 <div class="relative">
@@ -133,7 +150,7 @@
                     </select>
                 </div>
             </div>
-            <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
+            <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10"></div>
         </div>
     </main>
 
@@ -150,7 +167,8 @@
                 deadline_label: "SON TARİX", btn_view: "KURSA BAX →", free_text: "Pulsuz",
                 search_placeholder: "Axtar...", cat_all: "Bütün Kateqoriyalar", cat_intern: "Təcrübə",
                 cat_summer: "Yay Proqramı", cat_math: "Riyaziyyat", cat_prog: "Proqramlaşdırma",
-                cat_general: "Ümumi", courses_subtitle: "Kursları axtarın və siyahınıza əlavə edin."
+                cat_general: "Ümumi", courses_subtitle: "Kursları axtarın və siyahınıza əlavə edin.",
+                no_courses: "Kurs tapılmadı və ya yüklənir..."
             },
             en: {
                 nav_home: "Home Page", nav_courses: "My Courses", nav_survey: "Submit Course", nav_courses_title: "COURSES",
@@ -158,11 +176,18 @@
                 deadline_label: "DEADLINE", btn_view: "VIEW COURSE →", free_text: "Free",
                 search_placeholder: "Search...", cat_all: "All Categories", cat_intern: "Internship",
                 cat_summer: "Summer Program", cat_math: "Mathematics", cat_prog: "Programming",
-                cat_general: "General", courses_subtitle: "Search and add courses to your list."
+                cat_general: "General", courses_subtitle: "Search and add courses to your list.",
+                no_courses: "No courses found or loading..."
             }
         };
 
         const softColors = ['#E0F2FE', '#FFEDD5', '#F1F5F9', '#ECFDF5', '#FDF2F8', '#EEF2FF'];
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+        }
 
         async function fetchCourses() {
             try {
@@ -197,13 +222,14 @@
 
         function renderCourses(courses) {
             const grid = document.getElementById('coursesGrid');
+            const lang = localStorage.getItem('preferredLang') || 'en';
+            const t = translations[lang];
+
             if (courses.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-20 font-bold text-slate-400">Kurs tapılmadı və ya yüklənir...</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-20 font-bold text-slate-400">${t.no_courses}</div>`;
                 return;
             }
 
-            const lang = localStorage.getItem('preferredLang') || 'en';
-            const t = translations[lang];
             const selected = JSON.parse(localStorage.getItem('selectedCourses')) || [];
             
             grid.innerHTML = courses.map((course, index) => {
@@ -243,7 +269,7 @@
                     </div>
                     
                     <div class="w-full h-auto mb-6">
-                        <h3 class="text-xl font-black text-slate-900 leading-tight mb-4 break-text" style="max-width: 80%">${title}</h3>
+                        <h3 class="text-lg md:text-xl font-black text-slate-900 leading-tight mb-4 break-text" style="max-width: 80%">${title}</h3>
                         <p class="text-slate-600 text-[11px] font-bold leading-relaxed block overflow-visible h-auto break-text">
                             ${desc}
                         </p>
@@ -319,7 +345,7 @@
 
         document.getElementById('logoutBtnInside').onclick = async () => {
             await _supabase.auth.signOut();
-            localStorage.removeItem('loggedInUser'); // survey.html-dəki ilə eyniləşdirildi
+            localStorage.removeItem('loggedInUser');
             window.location.href = 'login.html';
         };
 

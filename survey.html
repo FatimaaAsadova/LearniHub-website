@@ -32,9 +32,13 @@
         .form-card { background: #FDFCF8; border: 2px solid #2D2D2D; border-radius: 32px; }
 
         .input-field {
-            width: 100%; padding: 18px 24px; border: 2px solid #2D2D2D; border-radius: 20px;
+            width: 100%; padding: 16px 20px; border: 2px solid #2D2D2D; border-radius: 18px;
             outline: none; transition: all 0.3s; font-size: 14px; font-weight: 700;
             color: #1A1A1A; background-color: white;
+        }
+
+        @media (min-width: 768px) {
+            .input-field { padding: 18px 24px; border-radius: 20px; }
         }
 
         #userAccountBtn { background-color: #D1FAE5; border: 2px solid #2D2D2D; border-radius: 9999px; }
@@ -42,7 +46,9 @@
         .btn-submit { background-color: #2D2D2D; color: white; border: 2px solid #2D2D2D; font-weight: 800; transition: all 0.2s; }
         .btn-submit:active { transform: scale(0.98); }
 
-        .top-submission-bar { background-color: #F8F3E9; padding: 30px 20px 10px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        .top-submission-bar { background-color: #F8F3E9; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; border-bottom: 1.5px solid #E2E8F0; }
+        @media (min-width: 768px) { .top-submission-bar { padding: 30px 20px 10px 20px; } }
+
         .submission-btn-top { background-color: #D6CADD; border: 2.5px solid #2D2D2D; border-radius: 50px; padding: 8px 35px; font-weight: 800; font-size: 13px; color: #2D2D2D; text-transform: uppercase; }
 
         #userDropdown {
@@ -56,14 +62,27 @@
             border-radius: 18px !important;
             box-shadow: 6px 6px 0px 0px rgba(0,0,0,1) !important;
         }
+
+        /* Mobile Header */
+        .mobile-nav { border-bottom: 1.5px solid #E2E8F0; background: #F8F3E9; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
-    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-transparent md:sticky md:top-0 z-40 sidebar-border">
-        <h2 class="text-xl font-black text-slate-900 mb-10 tracking-tighter px-2">
-            <a href="index.html">LEARNIHUB<span class="text-indigo-600"></span></a>
-        </h2>
+    <div class="md:hidden flex items-center justify-between p-4 mobile-nav sticky top-0 z-50">
+        <h2 class="text-lg font-black text-slate-900 tracking-tighter">LEARNIHUB</h2>
+        <button onclick="toggleSidebar()" class="p-2 border-2 border-slate-900 rounded-lg bg-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 h-screen px-4 py-8 bg-[#F8F3E9] md:bg-transparent fixed md:sticky top-0 z-40 sidebar-border overflow-y-auto">
+        <div class="flex justify-between items-center mb-10 md:block">
+            <h2 class="text-xl font-black text-slate-900 tracking-tighter px-2">
+                <a href="index.html">LEARNIHUB</a>
+            </h2>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-900 font-bold">X</button>
+        </div>
         
         <nav class="flex-1">
             <a href="index.html" class="nav-link"><span data-key="nav_home">Home Page</span></a>
@@ -71,7 +90,7 @@
             <a href="survey.html" class="nav-link nav-link-active"><span data-key="nav_survey">Submit Course</span></a>
         </nav>
 
-        <div class="space-y-6">
+        <div class="space-y-6 mt-10 md:mt-0">
             <div class="px-2">
                 <div class="bg-white/50 p-1 rounded-xl flex gap-1 border-2 border-slate-900">
                     <button id="btnAz" onclick="toggleLang('az')" class="flex-1 py-1.5 text-[9px] font-extrabold rounded-lg">AZ</button>
@@ -79,7 +98,7 @@
                 </div>
             </div>
 
-            <div class="relative px-2">
+            <div class="relative px-2 mb-4">
                 <div id="userDropdown">
                     <a href="profile.html" class="block p-2 text-[10px] font-bold hover:bg-slate-50 rounded-lg" data-key="nav_profile">PROFILE</a>
                     <button id="logoutBtn" class="text-red-500 block p-2 text-[10px] font-bold w-full text-left hover:bg-red-50 rounded-lg" data-key="btn_logout">LOGOUT</button>
@@ -95,13 +114,13 @@
     <main class="flex-1">
         <div class="top-submission-bar">
             <div class="submission-btn-top" data-key="badge">COURSE SUBMISSION</div>
-            <p class="text-slate-500 text-[11px] font-bold mt-2" data-key="subtitle">Share educational resources with us to enrich our platform.</p>
+            <p class="text-slate-500 text-[11px] font-bold mt-2 text-center" data-key="subtitle">Share educational resources with us to enrich our platform.</p>
         </div>
 
-        <div class="p-6 lg:p-12 max-w-3xl mx-auto">
-            <div class="form-card p-8 md:p-12">
+        <div class="p-4 md:p-6 lg:p-12 max-w-3xl mx-auto">
+            <div class="form-card p-6 md:p-12">
                 <div id="message" class="hidden"></div>
-                <form id="surveyForm" class="space-y-8">
+                <form id="surveyForm" class="space-y-6 md:space-y-8">
                     <div class="space-y-3">
                         <label class="text-[11px] font-black text-slate-900 uppercase tracking-widest ml-1" data-key="labelName">COURSE NAME *</label>
                         <input type="text" id="course_name" class="input-field" required>
@@ -175,11 +194,17 @@
             }
         };
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+        }
+
         function initFlatpickr(lang) {
             if (fp) fp.destroy();
             fp = flatpickr("#deadline", {
                 locale: lang === 'az' ? "az" : "default",
-                dateFormat: "d.m.Y", // İstifadəçi daxil edən format
+                dateFormat: "d.m.Y",
                 allowInput: true
             });
         }
@@ -215,17 +240,14 @@
             submitBtn.disabled = true;
             const lang = localStorage.getItem('preferredLang') || 'en';
             
-            // Tarix formatlama hissəsi
-            const rawDeadline = document.getElementById('deadline').value; // Məsələn: "13.02.2008"
+            const rawDeadline = document.getElementById('deadline').value;
             let formattedDeadline = null;
 
             if (rawDeadline) {
                 const parts = rawDeadline.split('.');
                 if (parts.length === 3) {
-                    // "13.02.2008" -> "2008-02-13" formatına çevirir
                     formattedDeadline = `${parts[2]}-${parts[1]}-${parts[0]}`;
                 } else {
-                    // Əgər format Flatpickr vasitəsilə artıq YYYY-MM-DD-dirsə
                     formattedDeadline = rawDeadline;
                 }
             }
@@ -234,7 +256,7 @@
                 course_name: document.getElementById('course_name').value.trim(),
                 course_link: document.getElementById('course_link').value.trim(),
                 category: document.getElementById('category').value,
-                deadline: formattedDeadline, // Artıq düzgün formatdadır
+                deadline: formattedDeadline,
                 description: document.getElementById('description').value.trim(),
                 created_at: new Date().toISOString()
             };
