@@ -55,7 +55,6 @@
       .auth-card { border-radius: 30px; padding: 1.5rem !important; }
     }
 
-    /* Göz işarəsi üçün əlavə stil */
     .password-toggle {
       position: absolute;
       right: 16px;
@@ -139,7 +138,6 @@
   </div>
 
   <script>
-    // Şifrəni göstər/gizlə funksiyası
     function togglePasswordVisibility(inputId) {
       const input = document.getElementById(inputId);
       const icon = event.currentTarget.querySelector('svg');
@@ -255,6 +253,7 @@
       btn.disabled = true;
       btn.innerText = "...";
 
+      // Redirect URL-i birbaşa təyin edirik
       const redirectUrl = 'https://learni-hub-website-pcpr.vercel.app/reset-password.html';
 
       const { error } = await supabaseClient.auth.resetPasswordForEmail(resetEmail, {
@@ -262,6 +261,7 @@
       });
 
       if (error) {
+        console.error("Detallı Supabase Xətası:", error); // Xətanın əsl səbəbini konsolda göstər
         msg.innerText = error.message;
         msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-700 block mb-4";
         msg.classList.remove('hidden');
