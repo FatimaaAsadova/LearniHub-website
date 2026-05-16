@@ -206,19 +206,31 @@
         function filterCourses() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const category = document.getElementById('categorySelect').value;
+            const lang = localStorage.getItem('preferredLang') || 'en';
 
             const filtered = allCourses.filter(c => {
                 const titleAz = (c.title_az || c.title || "").toLowerCase();
                 const titleEn = (c.title_en || "").toLowerCase();
                 const matchesSearch = titleAz.includes(searchTerm) || titleEn.includes(searchTerm);
                 
-                const courseCat = String(c.category || '').trim();
+                const courseCat = lang === 'en' 
+                    ? String(c.category_en || c.category || '').trim() 
+                    : String(c.category || '').trim();
                 const matchesCategory = (category === 'all' || courseCat === category);
                 
                 return matchesSearch && matchesCategory;
             });
             renderCourses(filtered);
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userBtn = document.getElementById('userAccountBtn');
+            const userDrop = document.getElementById('userDropdown');
+            if (userBtn && userDrop) {
+                userBtn.onclick = (e) => { e.stopPropagation(); userDrop.classList.toggle('show'); };
+            }
+            document.onclick = () => { if (userDrop) userDrop.classList.remove('show'); };
+        });
 
         function renderCourses(courses) {
             const grid = document.getElementById('coursesGrid');
@@ -242,8 +254,8 @@
                     displayPrice = t.free_text;
                 }
 
-                let displayCat = course.category || (lang === 'en' ? 'General' : 'Ümumi');
-                const rawCat = String(course.category || '').trim().toLowerCase();
+                let displayCat = (lang === 'en' ? (course.category_en || course.category) : course.category) || (lang === 'en' ? 'General' : 'Ümumi');
+                const rawCat = String(lang === 'en' ? (course.category_en || course.category || '') : (course.category || '')).trim().toLowerCase();
 
                 if (rawCat.includes('internship')) displayCat = t.cat_intern;
                 else if (rawCat.includes('summer program')) displayCat = t.cat_summer;
@@ -348,11 +360,6 @@
             localStorage.removeItem('loggedInUser');
             window.location.href = 'login.html';
         };
-
-        const userBtn = document.getElementById('userAccountBtn');
-        const userDrop = document.getElementById('userDropdown');
-        userBtn.onclick = (e) => { e.stopPropagation(); userDrop.classList.toggle('show'); };
-        document.onclick = () => userDrop.classList.remove('show');
 
         window.onload = () => { 
             const savedLang = localStorage.getItem('preferredLang') || 'en';
