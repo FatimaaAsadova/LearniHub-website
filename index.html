@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Learnihub — Professional Learning Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
@@ -14,7 +15,6 @@
       color: #1e293b;
     }
 
-    /* Kiçik nöqtəli ulduz effekti */
     .grid-stars {
       background-image: radial-gradient(#d1d5db 1px, transparent 1px);
       background-size: 20px 20px;
@@ -245,7 +245,10 @@
         mappings.forEach(item => {
             const el = document.getElementById(item.id);
             if (el) {
-                el.addEventListener('click', (e) => {
+                // Köhnə event listener-ləri təmizləmək üçün clone-layırıq
+                const newEl = el.cloneNode(true);
+                el.parentNode.replaceChild(newEl, el);
+                newEl.addEventListener('click', (e) => {
                     e.preventDefault();
                     protectedNavigate(item.url);
                 });
@@ -282,22 +285,58 @@
         document.documentElement.lang = lang;
     }
 
+    function updateAuthUI(user, lang) {
+        if (user) {
+            document.getElementById('signInBtn').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            const cta = document.getElementById('mainCtaBtn');
+            if (cta) cta.textContent = translations[lang].dashboard_text;
+        } else {
+            document.getElementById('signInBtn').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            const cta = document.getElementById('mainCtaBtn');
+            if (cta) cta.textContent = translations[lang].btn_explore;
+        }
+    }
+
+    // Supabase instansiyası
+    const _supabaseUrl = "https://sqgphrdkthiixeikialy.supabase.co"; 
+    const _supabaseKey = "sb_publishable_ysE34rB_P609-Mw6u_Tcug_JNZRylrq";
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
+
     window.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem('preferredLang') || 'az';
         switchLanguage(savedLang);
         setupClickListeners();
 
-        const user = localStorage.getItem('loggedInUser');
-        if (user) {
-            document.getElementById('signInBtn').classList.add('hidden');
-            document.getElementById('logoutBtn').classList.remove('hidden');
-            const cta = document.getElementById('mainCtaBtn');
-            if (cta) cta.textContent = translations[savedLang].dashboard_text;
-        }
+        // Cari vəziyyəti oxu
+        const initialUser = localStorage.getItem('loggedInUser');
+        updateAuthUI(initialUser, savedLang);
+
+        // Supabase sessiyalarını (həm daxilolma, həm qeydiyyat, həm də OAuth redirect) asinxron izləyən dinləyici:
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            const currentLang = localStorage.getItem('preferredLang') || 'az';
+            if (session && session.user) {
+                localStorage.setItem('loggedInUser', JSON.stringify(session.user));
+                updateAuthUI(JSON.stringify(session.user), currentLang);
+                
+                // Əgər qorunan keçiddən bura yönləndirilibsə, dərhal ora göndər
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                }
+            } else if (event === 'SIGNED_OUT') {
+                localStorage.removeItem('loggedInUser');
+                updateAuthUI(null, currentLang);
+            }
+        });
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
         localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('redirectAfterLogin');
         window.location.href = 'index.html';
     });
   </script>

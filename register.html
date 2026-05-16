@@ -213,7 +213,7 @@
       await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: { 
-          redirectTo: window.location.origin + '/index.html',
+          redirectTo: window.location.origin + window.location.pathname.replace('register.html', 'index.html'),
           queryParams: { access_type: 'offline', prompt: 'select_account' }
         }
       });
@@ -238,7 +238,7 @@
       btn.disabled = true;
       btn.innerText = translations[currentLang].creating;
 
-      const { error } = await supabaseClient.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
         options: { data: { full_name: fullname } }
@@ -251,11 +251,15 @@
         btn.disabled = false;
         btn.innerText = translations[currentLang].btnRegister;
       } else {
+        // Qeydiyyat uğurludursa sessiyanı dərhal qeyd edib index.html-ə yönləndiririk
+        if (data && data.user) {
+          localStorage.setItem('loggedInUser', JSON.stringify(data.user));
+        }
         btn.innerText = translations[currentLang].success;
         msg.innerText = translations[currentLang].success;
         msg.className = "p-3 rounded-xl text-xs font-bold text-center bg-green-100 text-green-700 block mb-4";
         msg.classList.remove('hidden');
-        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
       }
     });
   </script>
