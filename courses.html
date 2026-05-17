@@ -134,7 +134,7 @@
             <p class="text-slate-500 text-[11px] font-bold mt-2 text-center" data-key="courses_subtitle">Kursları axtarın və siyahınıza əlavə edin.</p>
         </div>
 
-        <div class="p-4 md:p-6 lg:p-10 max-w-7xl mx-auto"> 
+        <div class="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto"> 
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
                 <div class="md:col-span-3">
                     <input type="text" id="searchInput" oninput="filterCourses()" placeholder="Axtar..." class="w-full px-5 py-4 neo-input outline-none font-bold text-xs">
@@ -161,7 +161,7 @@
                     </select>
                 </div>
             </div>
-            <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10"></div>
+            <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
         </div>
     </main>
 
@@ -219,9 +219,9 @@
         }
 
         function filterCourses() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const category = document.getElementById('categorySelect').value;
-            const formatFilter = document.getElementById('formatSelect').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedCategory = document.getElementById('categorySelect').value.toLowerCase().trim();
+            const formatFilter = document.getElementById('formatSelect').value.toLowerCase().trim();
             const lang = localStorage.getItem('preferredLang') || 'en';
 
             const filtered = allCourses.filter(c => {
@@ -229,24 +229,34 @@
                 const titleEn = (c.title_en || "").toLowerCase();
                 const matchesSearch = titleAz.includes(searchTerm) || titleEn.includes(searchTerm);
                 
-                const courseCat = lang === 'en' 
-                    ? String(c.category_en || c.category || '').trim() 
-                    : String(c.category || '').trim();
-                const matchesCategory = (category === 'all' || courseCat === category);
+                // Kateqoriya Filtrasiyası üçün həm EN, həm AZ bazası standartlaşdırılır
+                const catEn = String(c.category_en || c.category || '').toLowerCase().trim();
+                const catAz = String(c.category || '').toLowerCase().trim();
                 
-                // Format Filtrasiya Məntiqi (həm en, həm az bazasını yoxlayır)
+                let matchesCategory = false;
+                if (selectedCategory === 'all') {
+                    matchesCategory = true;
+                } else {
+                    matchesCategory = catEn.includes(selectedCategory) || catAz.includes(selectedCategory) ||
+                                      (selectedCategory === 'internship' && catAz.includes('təcrübə')) ||
+                                      (selectedCategory === 'summer program' && catAz.includes('yay')) ||
+                                      (selectedCategory === 'mathematics' && catAz.includes('riyaziyyat')) ||
+                                      (selectedCategory === 'programming' && catAz.includes('proqramlaşdırma')) ||
+                                      (selectedCategory === 'hackathon' && catAz.includes('hakaton'));
+                }
+                
+                // Format Filtrasiyası
                 const formatEn = String(c.format_en || '').toLowerCase().trim();
                 const formatAz = String(c.format_az || '').toLowerCase().trim();
-                const targetFormat = formatFilter.toLowerCase();
                 
                 let matchesFormat = false;
                 if (formatFilter === 'all') {
                     matchesFormat = true;
-                } else if (targetFormat === 'hybrid') {
+                } else if (formatFilter === 'hybrid') {
                     matchesFormat = formatEn.includes('hybrid') || formatAz.includes('hibrid');
-                } else if (targetFormat === 'on-site') {
+                } else if (formatFilter === 'on-site') {
                     matchesFormat = formatEn.includes('on-site') || formatAz.includes('əyani') || formatAz.includes('on-site');
-                } else if (targetFormat === 'online') {
+                } else if (formatFilter === 'online') {
                     matchesFormat = formatEn.includes('online') || formatAz.includes('onlayn');
                 }
                 
@@ -286,20 +296,20 @@
                     displayPrice = t.free_text;
                 }
 
-                // Kateqoriyaların Tərcümə Edilməsi
+                // Kateqoriyaların dinamik vizuallaşdırılması
                 let displayCat = (lang === 'en' ? (course.category_en || course.category) : course.category) || (lang === 'en' ? 'General' : 'Ümumi');
                 const rawCat = String(lang === 'en' ? (course.category_en || course.category || '') : (course.category || '')).trim().toLowerCase();
 
-                if (rawCat.includes('internship')) displayCat = t.cat_intern;
-                else if (rawCat.includes('summer program')) displayCat = t.cat_summer;
-                else if (rawCat.includes('mathematics')) displayCat = t.cat_math;
-                else if (rawCat.includes('programming')) displayCat = t.cat_prog;
-                else if (rawCat.includes('hackathon')) displayCat = t.cat_hack;
+                if (rawCat.includes('internship') || rawCat.includes('təcrübə')) displayCat = t.cat_intern;
+                else if (rawCat.includes('summer program') || rawCat.includes('yay')) displayCat = t.cat_summer;
+                else if (rawCat.includes('mathematics') || rawCat.includes('riyaziyyat')) displayCat = t.cat_math;
+                else if (rawCat.includes('programming') || rawCat.includes('proqramlaşdırma')) displayCat = t.cat_prog;
+                else if (rawCat.includes('hackathon') || rawCat.includes('hakaton')) displayCat = t.cat_hack;
                 else if (rawCat.includes('challenges')) displayCat = t.cat_challenge;
                 else if (rawCat.includes('honors')) displayCat = t.cat_honors;
-                else if (rawCat.includes('general')) displayCat = t.cat_general;
+                else if (rawCat.includes('general') || rawCat.includes('ümumi')) displayCat = t.cat_general;
 
-                // Formatın Tərcümə Edilməsi
+                // Format məlumatı
                 let displayFormat = '';
                 const rawFormat = String(course.format_en || course.format_az || '').trim().toLowerCase();
                 if (rawFormat.includes('hybrid') || rawFormat.includes('hibrid')) displayFormat = t.form_hybrid;
@@ -308,27 +318,31 @@
 
                 return `
                 <div class="course-card">
-                    <button onclick="toggleDashboard('${course.id}')" class="absolute top-6 right-6 z-10">
-                        ${isAdded ? 
-                            `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border-2 border-slate-900">${t.added_text}</span>` : 
-                            `<div class="w-8 h-8 bg-white border-2 border-slate-900 rounded-full flex items-center justify-center hover:bg-emerald-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </div>`
-                        }
-                    </button>
-                    
-                    <div class="mb-4 flex flex-wrap gap-2">
-                        <span class="cat-badge uppercase" style="background-color: ${softColors[index % 6]}">
-                            ${displayCat}
-                        </span>
-                        ${displayFormat ? `
-                        <span class="cat-badge uppercase bg-white text-slate-700">
-                            ${displayFormat}
-                        </span>` : ''}
+                    <div class="flex justify-between items-start gap-2 mb-4 w-full">
+                        <div class="flex flex-wrap gap-1.5 max-w-[70%]">
+                            <span class="cat-badge uppercase" style="background-color: ${softColors[index % 6]}">
+                                ${displayCat}
+                            </span>
+                            ${displayFormat ? `
+                            <span class="cat-badge uppercase bg-white text-slate-700">
+                                ${displayFormat}
+                            </span>` : ''}
+                        </div>
+                        
+                        <div class="flex-shrink-0">
+                            <button onclick="toggleDashboard('${course.id}')">
+                                ${isAdded ? 
+                                    `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-full border-2 border-slate-900 block whitespace-nowrap">${t.added_text}</span>` : 
+                                    `<div class="w-8 h-8 bg-white border-2 border-slate-900 rounded-full flex items-center justify-center hover:bg-emerald-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    </div>`
+                                }
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="w-full h-auto mb-6">
-                        <h3 class="text-lg md:text-xl font-black text-slate-900 leading-tight mb-4 break-text" style="max-width: 80%">${title}</h3>
+                        <h3 class="text-lg md:text-xl font-black text-slate-900 leading-tight mb-4 break-text">${title}</h3>
                         <p class="text-slate-600 text-[11px] font-bold leading-relaxed block overflow-visible h-auto break-text">
                             ${desc}
                         </p>
