@@ -148,6 +148,25 @@
           <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase">Price Tag</label><input type="text" id="editPrice" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold"></div>
           <div class="space-y-1"><label class="text-[10px] font-black text-rose-500 uppercase">Deadline</label><input type="date" id="editDeadline" class="w-full p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl outline-none font-bold"></div>
           
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase">Format (AZ)</label>
+            <select id="editFormatAz" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-600">
+              <option value="">Seçin</option>
+              <option value="On-site">On-site (Əyani)</option>
+              <option value="Hibrid">Hibrid</option>
+              <option value="Onlayn">Onlayn</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-indigo-600 uppercase">Format (EN - FOR FILTERS)</label>
+            <select id="editFormatEn" class="w-full p-4 bg-indigo-50 border border-indigo-200 rounded-2xl outline-none font-bold text-indigo-600">
+              <option value="">Select</option>
+              <option value="On-site">On-site</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Online">Online</option>
+            </select>
+          </div>
+
           <div class="col-span-2 space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase">Resource Link</label><input type="text" id="editLink" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-blue-600 font-medium"></div>
           
           <div class="col-span-2 space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase">Description (AZ)</label><textarea id="editDescriptionAz" rows="3" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none resize-none"></textarea></div>
@@ -231,6 +250,10 @@
         document.getElementById('editPrice').value = item.price || '';
         document.getElementById('editDeadline').value = item.deadline || '';
         
+        // Format sahələrini doldururuq (əgər bazada data varsa)
+        document.getElementById('editFormatAz').value = item.format_az || '';
+        document.getElementById('editFormatEn').value = item.format_en || '';
+        
         document.getElementById('editModal').classList.remove('hidden');
     }
 
@@ -252,7 +275,10 @@
             description_en: document.getElementById('editDescriptionEn').value.trim(),
             price: document.getElementById('editPrice').value.trim(),
             link: document.getElementById('editLink').value.trim(),
-            deadline: document.getElementById('editDeadline').value || null
+            deadline: document.getElementById('editDeadline').value || null,
+            // Format sahələrini payload-a əlavə edirik
+            format_az: document.getElementById('editFormatAz').value,
+            format_en: document.getElementById('editFormatEn').value
         };
 
         try {

@@ -135,7 +135,7 @@
         </div>
 
         <div class="p-4 md:p-6 lg:p-10 max-w-7xl mx-auto"> 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
                 <div class="md:col-span-3">
                     <input type="text" id="searchInput" oninput="filterCourses()" placeholder="Axtar..." class="w-full px-5 py-4 neo-input outline-none font-bold text-xs">
                 </div>
@@ -146,7 +146,18 @@
                         <option value="Summer Program" data-key="cat_summer">Yay Proqramı</option>
                         <option value="Mathematics" data-key="cat_math">Riyaziyyat</option>
                         <option value="Programming" data-key="cat_prog">Proqramlaşdırma</option>
+                        <option value="Hackathon" data-key="cat_hack">Hakaton</option>
+                        <option value="Challenges" data-key="cat_challenge">Challenges</option>
+                        <option value="Honors" data-key="cat_honors">Honors</option>
                         <option value="General" data-key="cat_general">Ümumi</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <select id="formatSelect" onchange="filterCourses()" class="w-full px-5 py-4 neo-input outline-none font-bold text-xs cursor-pointer appearance-none">
+                        <option value="all" data-key="form_all">Bütün Formatlar</option>
+                        <option value="On-site" data-key="form_onsite">On-site</option>
+                        <option value="Hybrid" data-key="form_hybrid">Hybrid</option>
+                        <option value="Online" data-key="form_online">Online</option>
                     </select>
                 </div>
             </div>
@@ -167,8 +178,10 @@
                 deadline_label: "SON TARİX", btn_view: "KURSA BAX →", free_text: "Pulsuz",
                 search_placeholder: "Axtar...", cat_all: "Bütün Kateqoriyalar", cat_intern: "Təcrübə",
                 cat_summer: "Yay Proqramı", cat_math: "Riyaziyyat", cat_prog: "Proqramlaşdırma",
+                cat_hack: "Hakaton", cat_challenge: "Challenges", cat_honors: "Honors",
                 cat_general: "Ümumi", courses_subtitle: "Kursları axtarın və siyahınıza əlavə edin.",
-                no_courses: "Kurs tapılmadı və ya yüklənir..."
+                no_courses: "Kurs tapılmadı və ya yüklənir...",
+                form_all: "Bütün Formatlar", form_onsite: "On-site (Əyani)", form_hybrid: "Hibrid", form_online: "Onlayn"
             },
             en: {
                 nav_home: "Home Page", nav_courses: "My Courses", nav_survey: "Submit Course", nav_courses_title: "COURSES",
@@ -176,8 +189,10 @@
                 deadline_label: "DEADLINE", btn_view: "VIEW COURSE →", free_text: "Free",
                 search_placeholder: "Search...", cat_all: "All Categories", cat_intern: "Internship",
                 cat_summer: "Summer Program", cat_math: "Mathematics", cat_prog: "Programming",
+                cat_hack: "Hackathon", cat_challenge: "Challenges", cat_honors: "Honors",
                 cat_general: "General", courses_subtitle: "Search and add courses to your list.",
-                no_courses: "No courses found or loading..."
+                no_courses: "No courses found or loading...",
+                form_all: "All Formats", form_onsite: "On-site", form_hybrid: "Hybrid", form_online: "Online"
             }
         };
 
@@ -206,6 +221,7 @@
         function filterCourses() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const category = document.getElementById('categorySelect').value;
+            const formatFilter = document.getElementById('formatSelect').value;
             const lang = localStorage.getItem('preferredLang') || 'en';
 
             const filtered = allCourses.filter(c => {
@@ -218,7 +234,23 @@
                     : String(c.category || '').trim();
                 const matchesCategory = (category === 'all' || courseCat === category);
                 
-                return matchesSearch && matchesCategory;
+                // Format Filtrasiya Məntiqi (həm en, həm az bazasını yoxlayır)
+                const formatEn = String(c.format_en || '').toLowerCase().trim();
+                const formatAz = String(c.format_az || '').toLowerCase().trim();
+                const targetFormat = formatFilter.toLowerCase();
+                
+                let matchesFormat = false;
+                if (formatFilter === 'all') {
+                    matchesFormat = true;
+                } else if (targetFormat === 'hybrid') {
+                    matchesFormat = formatEn.includes('hybrid') || formatAz.includes('hibrid');
+                } else if (targetFormat === 'on-site') {
+                    matchesFormat = formatEn.includes('on-site') || formatAz.includes('əyani') || formatAz.includes('on-site');
+                } else if (targetFormat === 'online') {
+                    matchesFormat = formatEn.includes('online') || formatAz.includes('onlayn');
+                }
+                
+                return matchesSearch && matchesCategory && matchesFormat;
             });
             renderCourses(filtered);
         }
@@ -254,6 +286,7 @@
                     displayPrice = t.free_text;
                 }
 
+                // Kateqoriyaların Tərcümə Edilməsi
                 let displayCat = (lang === 'en' ? (course.category_en || course.category) : course.category) || (lang === 'en' ? 'General' : 'Ümumi');
                 const rawCat = String(lang === 'en' ? (course.category_en || course.category || '') : (course.category || '')).trim().toLowerCase();
 
@@ -261,7 +294,17 @@
                 else if (rawCat.includes('summer program')) displayCat = t.cat_summer;
                 else if (rawCat.includes('mathematics')) displayCat = t.cat_math;
                 else if (rawCat.includes('programming')) displayCat = t.cat_prog;
+                else if (rawCat.includes('hackathon')) displayCat = t.cat_hack;
+                else if (rawCat.includes('challenges')) displayCat = t.cat_challenge;
+                else if (rawCat.includes('honors')) displayCat = t.cat_honors;
                 else if (rawCat.includes('general')) displayCat = t.cat_general;
+
+                // Formatın Tərcümə Edilməsi
+                let displayFormat = '';
+                const rawFormat = String(course.format_en || course.format_az || '').trim().toLowerCase();
+                if (rawFormat.includes('hybrid') || rawFormat.includes('hibrid')) displayFormat = t.form_hybrid;
+                else if (rawFormat.includes('on-site') || rawFormat.includes('əyani')) displayFormat = t.form_onsite;
+                else if (rawFormat.includes('online') || rawFormat.includes('onlayn')) displayFormat = t.form_online;
 
                 return `
                 <div class="course-card">
@@ -274,10 +317,14 @@
                         }
                     </button>
                     
-                    <div class="mb-4">
+                    <div class="mb-4 flex flex-wrap gap-2">
                         <span class="cat-badge uppercase" style="background-color: ${softColors[index % 6]}">
                             ${displayCat}
                         </span>
+                        ${displayFormat ? `
+                        <span class="cat-badge uppercase bg-white text-slate-700">
+                            ${displayFormat}
+                        </span>` : ''}
                     </div>
                     
                     <div class="w-full h-auto mb-6">
